@@ -14,6 +14,7 @@ import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
+import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.messaging.support.MessageHeaderAccessor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -83,6 +84,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
                             accessor.setUser(authentication);
 
+                            accessor.setLeaveMutable(true);
+                            return MessageBuilder.createMessage(message.getPayload(), accessor.getMessageHeaders());
 
                         } else if (StompCommand.DISCONNECT.equals(accessor.getCommand())) {
                             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -100,6 +103,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
 
                 }
+
+                //TODO Expermintal
                 return message;
 
             }

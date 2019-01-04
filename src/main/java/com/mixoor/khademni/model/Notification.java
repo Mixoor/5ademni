@@ -11,7 +11,8 @@ import javax.validation.constraints.NotBlank;
 public class Notification extends DateAudit {
 
     @Id
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+       private Long id;
 
     @NotBlank
     private String description;

@@ -220,4 +220,44 @@ public class ModelMapper {
         return new Ticket(ticketRequest.getSubject(),ticketRequest.getContent(),user);
     }
 
+
+   public Conversation mapResquestToConversation(ConversationRequest request , User user1,User user2 ){
+        return new Conversation(
+               user1, user2,
+                0
+
+        );
+   }
+
+
+    public ConversationResponse mapConversationToResponse(Conversation conversation){
+        return new ConversationResponse(conversation.getId(),
+                mapUserToUserSummary(conversation.getUser1()),
+                mapUserToUserSummary(conversation.getUser2()),
+                conversation.getStatus()
+
+        );
+    }
+
+    public MessageResponse mapMessageToResponse( Message message){
+            return new MessageResponse(
+                    message.getId(),
+                    mapUserToUserSummary(message.getSender()),
+                    message.getMessage(),mapConversationToResponse(message.getConversation()),message.getDocument().getFileName()+message.getDocument().getFileType(),
+                    message.getStatus()
+            );
+    }
+
+
+    public Message mapRequestToMessage(MessageRequest request ,Document document,User user,Conversation  conversation ,int s ){
+            return  new Message(
+                    request.getContent(),
+                    s,
+                    user,
+                    document,
+                    conversation
+
+            );
+    }
+
 }

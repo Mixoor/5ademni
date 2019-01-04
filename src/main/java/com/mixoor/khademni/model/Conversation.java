@@ -10,6 +10,11 @@ import java.util.Date;
 @Entity
 public class Conversation extends DateAudit {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "first_user")
     @NotBlank
@@ -20,18 +25,14 @@ public class Conversation extends DateAudit {
     @OnDelete(action = OnDeleteAction.CASCADE)
     @NotBlank
     User user2;
-    @Temporal(TemporalType.TIMESTAMP)
-    Date time;
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+
+
     @NotBlank
     private int status = 0;
 
-    public Conversation(@NotBlank User user1, @NotBlank User user2, Date time, int status) {
+    public Conversation(@NotBlank User user1, @NotBlank User user2,  int status) {
         this.user1 = user1;
         this.user2 = user2;
-        this.time = time;
         this.status = status;
     }
 
@@ -60,13 +61,7 @@ public class Conversation extends DateAudit {
         this.user2 = user2;
     }
 
-    public Date getTime() {
-        return time;
-    }
 
-    public void setTime(Date time) {
-        this.time = time;
-    }
 
     public int getStatus() {
         return status;

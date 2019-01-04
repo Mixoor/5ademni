@@ -29,9 +29,7 @@ public class Message extends DateAudit {
     @JoinColumn(nullable = false, name = "sender_id")
     private User sender;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(nullable = false, name = "receiver_id")
-    private User receiver;
+
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(nullable = true, name = "file_id")
@@ -42,11 +40,10 @@ public class Message extends DateAudit {
     @JoinColumn(name = "conversation_id", nullable = false)
     private Conversation conversation;
 
-    public Message(@NotBlank String message, @NotBlank int status, User sender, User receiver, Document document, Conversation conversation) {
+    public Message(@NotBlank String message, @NotBlank int status, User sender, Document document, Conversation conversation) {
         this.message = message;
         this.status = status;
         this.sender = sender;
-        this.receiver = receiver;
         this.document = document;
         this.conversation = conversation;
     }
@@ -102,13 +99,6 @@ public class Message extends DateAudit {
         this.sender = sender;
     }
 
-    public User getReceiver() {
-        return receiver;
-    }
-
-    public void setReceiver(User receiver) {
-        this.receiver = receiver;
-    }
 
     public Document getDocument() {
         return document;

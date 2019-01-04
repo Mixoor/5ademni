@@ -15,6 +15,7 @@ public class UserPrincipal implements UserDetails {
 
     private Long id;
     private String name;
+    private String nameUser;
     private String email;
     private String picture;
 
@@ -24,10 +25,12 @@ public class UserPrincipal implements UserDetails {
     private Collection<? extends GrantedAuthority> authorities;
 
 
-    public UserPrincipal(Long id, String name, String email, String password, String picture, Collection<? extends GrantedAuthority> authorities) {
+    public UserPrincipal(Long id, String nameUser,String email, String password, String picture, Collection<? extends GrantedAuthority> authorities) {
         this.id = id;
-        this.name = name;
+        //this will be used in the websocket as identifiant
+        this.name = String.valueOf(id);
         this.email = email;
+        this.nameUser=nameUser;
         this.password = password;
         this.picture = picture;
         this.authorities = authorities;
@@ -117,5 +120,8 @@ public class UserPrincipal implements UserDetails {
         return Objects.hash(id);
     }
 
+    public String getNameUser() {
+        return nameUser;
+    }
 
 }
