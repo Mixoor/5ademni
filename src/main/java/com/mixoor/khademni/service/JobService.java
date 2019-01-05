@@ -5,6 +5,7 @@ import com.mixoor.khademni.Util.ModelMapper;
 import com.mixoor.khademni.config.UserPrincipal;
 import com.mixoor.khademni.exception.BadRequestException;
 import com.mixoor.khademni.exception.ResourceNotFoundException;
+import com.mixoor.khademni.exception.UnauthorizedException;
 import com.mixoor.khademni.model.*;
 import com.mixoor.khademni.payload.request.JobRequest;
 import com.mixoor.khademni.payload.response.ContractResponse;
@@ -63,6 +64,32 @@ public class JobService {
 
         return job;
     }
+
+    public Job UpdateJob(UserPrincipal current, JobRequest jobRequest) {
+
+        Client client = clientRepository.findById(current.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Client ", "id", String.valueOf(current.getId())));
+
+        if(client.getId().equals(current.getId()))
+            throw new UnauthorizedException("Unauthorized Error");
+
+        ModelMapper modelMapper = new ModelMapper();
+
+        Job job = modelMapper.mapJobRequestToJob(jobRequest, client);
+        List<Document> document=jobRequest.getFiles().stream()
+                .map( (f) ->
+                        documentStorageService
+                                .documentToJob(documentStorageService.storeFile(f)
+                                        ,client,job)
+                ).collect(Collectors.toList());
+
+
+        return job;
+    }
+
+
+
+
 
     public PagedResponse<JobResponse> getAllJobsAvailable(UserPrincipal current, boolean b, int page, int size) {
         validatePageAndSize(page, size);

@@ -5,6 +5,7 @@ import com.mixoor.khademni.config.CurrentUser;
 import com.mixoor.khademni.config.UserPrincipal;
 import com.mixoor.khademni.exception.ResourceNotFoundException;
 import com.mixoor.khademni.model.Job;
+import com.mixoor.khademni.model.User;
 import com.mixoor.khademni.payload.request.JobRequest;
 import com.mixoor.khademni.payload.response.ApiResponse;
 import com.mixoor.khademni.payload.response.ContractResponse;
@@ -97,6 +98,7 @@ public class JobController {
 
     @GetMapping("/job/{id}")
     public JobResponse getJob(@PathVariable(value = "id") Long id) {
+
         return jobService.getJobById(id);
     }
 
@@ -124,15 +126,9 @@ public class JobController {
 
     @PutMapping("/job/{id}")
     @PreAuthorize("hasRole('ROLE_CLIENT')")
-    public Job updateJob(@PathVariable Long id, @Valid JobRequest job) {
-        return jobRepository.findById(id).map(j -> {
-            j.setTitle(job.getTitle());
-            j.setBudget(Long.parseLong(job.getBudget()));
-            j.setContent(job.getDescription());
-            j.setDelai(job.getDelai());
-            return jobRepository.save(j);
+    public Job updateJob(@CurrentUser UserPrincipal userPrincipal, @PathVariable Long id, @Valid JobRequest job) {
+        return  jobService.UpdateJob(userPrincipal,job);
 
-        }).orElseThrow(() -> new ResourceNotFoundException("Job", "id", String.valueOf(id)));
     }
 
 

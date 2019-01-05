@@ -3,6 +3,7 @@ package com.mixoor.khademni.Util;
 import com.mixoor.khademni.model.*;
 import com.mixoor.khademni.payload.request.*;
 import com.mixoor.khademni.payload.response.*;
+import com.mixoor.khademni.repository.DocumentRepository;
 import com.mixoor.khademni.repository.SkillRepository;
 import com.mixoor.khademni.service.DocumentStorageService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,9 @@ public class ModelMapper {
 
     @Autowired
     private SkillRepository skillRepository;
+
+    @Autowired
+    private DocumentRepository documentRepository;
 
 
     public Job mapJobRequestToJob(JobRequest jobRequest, Client client) {
@@ -40,7 +44,9 @@ public class ModelMapper {
                 d.setFileType(file.getFileType());
                 d.setUser(client);
                 job.addFile(d);
+                d.setSize(file.getSize());
             });
+
 
         if (!jobRequest.getSkills().isEmpty())
             jobRequest.getSkills().forEach(s -> {
@@ -63,9 +69,17 @@ public class ModelMapper {
                 .map(skill -> new SkillResponse(skill.getName()))
                 .collect(Collectors.toList());
 
+        List<UploadFileResponse> files = documentRepository.findByJob(job).stream()
+                .map(document -> new UploadFileResponse(document.getId()
+                        ,document.getFileName(),
+                        document.getFileType(),
+                        documentStorageService.DownloadLink(document.getFileName()+document.getFileType()),
+                        document.getSize()))
+                .collect(Collectors.toList());
+
         JobResponse jobResponse = new JobResponse(job.getId(), job.getTitle()
                 , job.getContent(), String.valueOf(job.getBudget()), job.getDelai()
-                , job.isAvailble(), userSummary, job.getCreatedAt(), skillResponse);
+                , job.isAvailble(), userSummary, job.getCreatedAt(), skillResponse,files);
 
         return jobResponse;
     }

@@ -50,6 +50,22 @@ public class PostService {
 
     }
 
+    public PostResponse updatePost(UserPrincipal current, PostRequest postRequest) {
+
+        User user = userRepository.findById(current.getId())
+                .orElseThrow(() -> new BadRequestException("User id invalid "));
+
+        Post post = new ModelMapper().mapResquestToPost(postRequest, user);
+        postRepository.save(post);
+
+        return new ModelMapper().mapPostToResponse(post, 0L, user);
+
+    }
+
+
+
+
+
     public PagedResponse<PostResponse> getPosts(int page, int size) {
         validatePageAndSize(page, size);
 

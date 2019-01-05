@@ -30,8 +30,17 @@ public class Document extends DateAudit {
     @JsonIgnore
     private Job job;
 
+    private long size;
 
     public Document() {
+    }
+
+    public Document(String fileName, String fileType, User user, Job job, long size) {
+        this.fileName = fileName;
+        this.fileType = fileType;
+        this.user = user;
+        this.job = job;
+        this.size = size;
     }
 
     public Document(String fileName, String fileType) {
@@ -77,5 +86,13 @@ public class Document extends DateAudit {
 
     public void setJob(Job job) {
         this.job = job;
+    }
+
+    public long getSize() {
+        return size;
+    }
+
+    public void setSize(long size) {
+        this.size = size;
     }
 }

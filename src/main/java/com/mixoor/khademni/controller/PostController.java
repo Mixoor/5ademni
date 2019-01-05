@@ -39,9 +39,16 @@ public class PostController {
     private ResponseEntity<?> addPost(@CurrentUser UserPrincipal userPrincipal, @Valid PostRequest postRequest) {
 
         postService.createPost(userPrincipal, postRequest);
-        return ResponseEntity.ok().body(new ApiResponse(true, "User registered successfully"));
+        return ResponseEntity.ok().body(new ApiResponse(true, "Article added successfully"));
 
     }
 
+    //TODO ADD @PutMapping
+    @PutMapping("/post/{id}")
+    @PreAuthorize("isAuthenticated()")
+    private  ResponseEntity<?> updatePost(@CurrentUser UserPrincipal userPrincipal, @Valid PostRequest postRequest){
+        postService.createPost(userPrincipal, postRequest);
+        return ResponseEntity.ok().body(new ApiResponse(true, "Post Updated successfully"));
 
+    }
 }

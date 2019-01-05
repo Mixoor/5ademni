@@ -41,6 +41,28 @@ public class JobResponse {
         this.skills = skills;
     }
 
+
+    public JobResponse(Long id, String title, String content, String budget, String delai, boolean availble, UserSummary createdby, Instant created, List<SkillResponse> skills, List<UploadFileResponse> uploadFileResponses) {
+        this.id = id;
+        this.title = title;
+        this.content = content;
+        this.budget = budget;
+        this.delai = delai;
+        this.availble = availble;
+        this.createdby = createdby;
+        this.created = created;
+        this.skills = skills;
+        this.uploadFileResponses = uploadFileResponses;
+    }
+
+    public List<UploadFileResponse> getUploadFileResponses() {
+        return uploadFileResponses;
+    }
+
+    public void setUploadFileResponses(List<UploadFileResponse> uploadFileResponses) {
+        this.uploadFileResponses = uploadFileResponses;
+    }
+
     public List<SkillResponse> getSkills() {
         return skills;
     }
