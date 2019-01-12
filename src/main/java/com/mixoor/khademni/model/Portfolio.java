@@ -11,6 +11,11 @@ import javax.validation.constraints.NotBlank;
 public class Portfolio extends DateAudit {
 
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "freelancer_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JsonIgnore
+    Freelancer freelancer;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -18,12 +23,6 @@ public class Portfolio extends DateAudit {
     private String description;
     @NotBlank
     private String title;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "freelancer_id")
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    @JsonIgnore
-    Freelancer freelancer;
 
     public Portfolio(@NotBlank String title, @NotBlank String description, Freelancer freelancer) {
         this.description = description;

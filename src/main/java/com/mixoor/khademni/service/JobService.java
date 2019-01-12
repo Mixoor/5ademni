@@ -11,7 +11,6 @@ import com.mixoor.khademni.payload.request.JobRequest;
 import com.mixoor.khademni.payload.response.ContractResponse;
 import com.mixoor.khademni.payload.response.JobResponse;
 import com.mixoor.khademni.payload.response.PagedResponse;
-import com.mixoor.khademni.payload.response.UploadFileResponse;
 import com.mixoor.khademni.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
@@ -43,7 +42,6 @@ public class JobService {
     @Autowired
     private FreelancerRepository freelancerRepository;
 
-    private ModelMapper modelMapper = new ModelMapper();
 
 
     public Job createJob(UserPrincipal current, JobRequest jobRequest) {
@@ -51,15 +49,14 @@ public class JobService {
         Client client = clientRepository.findById(current.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("Client ", "id", String.valueOf(current.getId())));
 
-        ModelMapper modelMapper = new ModelMapper();
 
-        Job job = modelMapper.mapJobRequestToJob(jobRequest, client);
-        List<Document> document=jobRequest.getFiles().stream()
-                .map( (f) ->
-             documentStorageService
-                     .documentToJob(documentStorageService.storeFile(f)
-                             ,client,job)
-        ).collect(Collectors.toList());
+        Job job = ModelMapper.mapJobRequestToJob(jobRequest, client);
+        List<Document> document = jobRequest.getFiles().stream()
+                .map((f) ->
+                        documentStorageService
+                                .documentToJob(documentStorageService.storeFile(f)
+                                        , client, job)
+                ).collect(Collectors.toList());
 
 
         return job;
@@ -70,25 +67,21 @@ public class JobService {
         Client client = clientRepository.findById(current.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("Client ", "id", String.valueOf(current.getId())));
 
-        if(client.getId().equals(current.getId()))
+        if (client.getId().equals(current.getId()))
             throw new UnauthorizedException("Unauthorized Error");
 
-        ModelMapper modelMapper = new ModelMapper();
 
-        Job job = modelMapper.mapJobRequestToJob(jobRequest, client);
-        List<Document> document=jobRequest.getFiles().stream()
-                .map( (f) ->
+        Job job = ModelMapper.mapJobRequestToJob(jobRequest, client);
+        List<Document> document = jobRequest.getFiles().stream()
+                .map((f) ->
                         documentStorageService
                                 .documentToJob(documentStorageService.storeFile(f)
-                                        ,client,job)
+                                        , client, job)
                 ).collect(Collectors.toList());
 
 
         return job;
     }
-
-
-
 
 
     public PagedResponse<JobResponse> getAllJobsAvailable(UserPrincipal current, boolean b, int page, int size) {
@@ -99,15 +92,13 @@ public class JobService {
 
 
 
-        ModelMapper modelMapper = new ModelMapper();
-
         if (jobs.getTotalElements() == 0)
             return new PagedResponse<>(Collections.emptyList(), jobs.getNumber()
                     , jobs.getSize()
                     , jobs.getTotalElements()
                     , jobs.getTotalPages(), jobs.isLast());
 
-        List<JobResponse> jobResponses = jobs.stream().map(job -> modelMapper.mapJobtoJobResponse(job, job.getClient()))
+        List<JobResponse> jobResponses = jobs.stream().map(job -> ModelMapper.mapJobtoJobResponse(job, job.getClient()))
                 .collect(Collectors.toList());
 
         PagedResponse<JobResponse> jobResponsePagedResponse =
@@ -126,7 +117,6 @@ public class JobService {
         Pageable pageable = PageRequest.of(page, size, Sort.Direction.DESC, "createdAt");
         Page<Job> jobs = jobRepository.findAllByAvailble(b, pageable);
 
-        ModelMapper modelMapper = new ModelMapper();
 
         if (jobs.getTotalElements() == 0)
             return new PagedResponse<>(Collections.emptyList(), jobs.getNumber()
@@ -136,7 +126,7 @@ public class JobService {
 
         List<JobResponse> jobResponses = jobs.stream().filter((job) -> job.getTitle().contains(title))
                 .map(job ->
-                        modelMapper.mapJobtoJobResponse(job, job.getClient())
+                        ModelMapper.mapJobtoJobResponse(job, job.getClient())
                 )
                 .collect(Collectors.toList());
 
@@ -157,7 +147,7 @@ public class JobService {
         Job job = jobRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Job", "id", String.valueOf(id)));
 
-        JobResponse jobResponse = new ModelMapper().mapJobtoJobResponse(job, job.getClient());
+        JobResponse jobResponse = ModelMapper .mapJobtoJobResponse(job, job.getClient());
 
         return jobResponse;
 
@@ -170,7 +160,7 @@ public class JobService {
         Freelancer freelancer = freelancerRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Freelancer", "id", String.valueOf(id)));
 
-        Pageable pageable = PageRequest.of(page, size, Sort.Direction.DESC, "createAt");
+        Pageable pageable = PageRequest.of(page, size, Sort.Direction.DESC, "createdAt");
         Page<Job> jobs = jobRepository.findByFreelancer(freelancer, pageable);
 
         if (jobs.getTotalElements() == 0)
@@ -179,7 +169,7 @@ public class JobService {
         List<JobResponse> jobResponses = jobs.stream()
                 .map((j) -> {
 
-                    JobResponse jobResponse = modelMapper.mapJobtoJobResponse(j, j.getClient());
+                    JobResponse jobResponse = ModelMapper.mapJobtoJobResponse(j, j.getClient());
                     return jobResponse;
                 }).collect(Collectors.toList());
 
@@ -192,7 +182,7 @@ public class JobService {
 
         Client client = clientRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Client", "id", String.valueOf(id)));
 
-        Pageable pageable = PageRequest.of(page, size, Sort.Direction.DESC, "createAt");
+        Pageable pageable = PageRequest.of(page, size, Sort.Direction.DESC, "createdAt");
         Page<Job> jobs = jobRepository.findByClient(client, pageable);
 
         if (jobs.getTotalElements() == 0)
@@ -200,7 +190,7 @@ public class JobService {
 
 
         List<JobResponse> jobResponses = jobs.stream().map((job) ->
-                modelMapper.mapJobtoJobResponse(job, job.getClient())).collect(Collectors.toList());
+                ModelMapper.mapJobtoJobResponse(job, job.getClient())).collect(Collectors.toList());
 
         return new PagedResponse<JobResponse>(jobResponses, jobs.getNumber(), jobs.getSize()
                 , jobs.getTotalElements(), jobs.getTotalPages(), jobs.isLast());
@@ -217,7 +207,7 @@ public class JobService {
         job1.setFreelancer(freelancer1);
         job1.setAvailble(false);
 
-        return modelMapper.mapJobtoJobResponse(job1, job1.getClient());
+        return ModelMapper.mapJobtoJobResponse(job1, job1.getClient());
 
     }
 
@@ -225,7 +215,7 @@ public class JobService {
     public PagedResponse<ContractResponse> getContract(UserPrincipal user, int page, int size) {
 
         validatePageAndSize(page, size);
-        Pageable pageable = PageRequest.of(page, size, Sort.Direction.DESC, "updateAt");
+        Pageable pageable = PageRequest.of(page, size, Sort.Direction.DESC, "updatedAt");
         Page<Job> jobs;
 
         if (user.getAuthorities().toArray()[0].toString() == "ROLE_CLIENT") {
@@ -243,7 +233,7 @@ public class JobService {
             return new PagedResponse<>(Collections.emptyList(), jobs.getNumber(), jobs.getSize(), jobs.getTotalElements(), jobs.getTotalPages(), jobs.isLast());
 
 
-        List<ContractResponse> list = jobs.stream().map(job -> modelMapper.mapJobToContract(job)).collect(Collectors.toList());
+        List<ContractResponse> list = jobs.stream().map(job -> ModelMapper.mapJobToContract(job)).collect(Collectors.toList());
 
         return new PagedResponse<ContractResponse>(list, jobs.getNumber(), jobs.getSize(), jobs.getTotalElements(), jobs.getTotalPages(), jobs.isLast());
 
@@ -256,7 +246,7 @@ public class JobService {
         List<Skill> skillList = Arrays.stream(skills).map((s) -> skillRepository.findByName(s).orElseThrow(() -> new BadRequestException("Skill not found")))
                 .collect(Collectors.toList());
 
-        Pageable pageable = PageRequest.of(page, size, Sort.Direction.DESC, "createAt");
+        Pageable pageable = PageRequest.of(page, size, Sort.Direction.DESC, "createdAt");
         Page<Job> jobs = jobRepository.findAllByAvailble(true, pageable);
 
         if (jobs.getTotalElements() == 0)
@@ -271,13 +261,46 @@ public class JobService {
 
         List<JobResponse> jobResponses = filteredJob.stream().map(job -> {
             Client client = clientRepository.findById(job.getClient().getId()).orElseThrow(() -> new BadRequestException("Client doesnt exist"));
-            return modelMapper.mapJobtoJobResponse(job, client);
+            return ModelMapper.mapJobtoJobResponse(job, client);
         })
                 .collect(Collectors.toList());
 
 
         return new PagedResponse<JobResponse>(jobResponses, jobPage.getNumber(), jobPage.getSize(),
                 jobPage.getTotalElements(), jobPage.getTotalPages(), jobPage.isLast());
+
+    }
+
+
+
+
+    //Still under test
+    public PagedResponse<JobResponse> searchJob(UserPrincipal userPrincipal, int page, int size, List<String> skills,int delai,Long min , Long max, String title, String direction) {
+        validatePageAndSize(page, size);
+
+        Sort.Direction order = direction.toUpperCase().contentEquals("DESC") ? Sort.Direction.DESC : Sort.Direction.ASC;
+        Pageable pageable = PageRequest.of(page, size, order, "createdAt");
+
+        Page<Job> jobsBeforeFiltering = null;
+
+        if (skills.size() > 0)
+        jobsBeforeFiltering = jobRepository
+                    .searchBySkillsAndTitle(skillRepository.getAll(skills),title,min,max,delai, pageable);
+        else
+            jobsBeforeFiltering = jobRepository.
+                    searchByTitle(title,min,max,delai, pageable);
+
+        if(jobsBeforeFiltering.getTotalElements() == 0 )
+            return new PagedResponse<>(Collections.emptyList(),page, size,jobsBeforeFiltering.getTotalElements(),
+                    jobsBeforeFiltering.getTotalPages(),jobsBeforeFiltering.isLast());
+
+
+        //Mapped to jobResponse
+
+        List<JobResponse> jobResponses = jobsBeforeFiltering.stream().map(job -> ModelMapper.mapJobtoJobResponse(job,job.getClient())).collect(Collectors.toList());
+
+        return new PagedResponse<>(jobResponses,jobsBeforeFiltering.getNumber(),jobsBeforeFiltering.getSize(),
+                jobsBeforeFiltering.getTotalElements(),jobsBeforeFiltering.getTotalPages(),jobsBeforeFiltering.isLast());
 
     }
 

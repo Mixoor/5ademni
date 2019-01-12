@@ -7,30 +7,38 @@ import com.mixoor.khademni.model.Skill;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 
 public interface JobRepository extends JpaRepository<Job, Long> {
 
-    Page<Job> findByIdAndAndAvailble(Long aLong, boolean b, Pageable pageable);
-
     Page<Job> findAllByAvailble(boolean available, Pageable pageable);
 
     Page<Job> findByClient(Client client, Pageable pageable);
-
-    Page<Job> findBySkillsAndAndAvailble(List<Skill> skill, boolean b, Pageable pageable);
 
     Page<Job> findByClientAndAvailble(Client client, boolean available, Pageable pageable);
 
     Page<Job> findByFreelancerAndAvailble(Freelancer freelancer, boolean available, Pageable pageable);
 
-    Page<Job> findBySkills(List<Skill> skills, Pageable pageable);
-
     Page<Job> findByFreelancer(Freelancer freelancer, Pageable pageable);
+
+    @Query("select j from Job j where  j.title like %:title% and j.availble = true and  (j.budget >= :min and j.budget <= :max) and j.delai >= :delai  order by ?#{#pageable}")
+    Page<Job> searchByTitle(@Param("title") String title,@Param("max") Long max,@Param("min") Long min,@Param("delai") int delai,Pageable  pageable);
+
+    @Query("select j from Job j where j.skills in :skills and j.title like %:title% and j.availble = true and (j.budget >= :min and j.budget <= :max) and j.delai >= :delai order by ?#{#pageable}")
+    Page<Job> searchBySkillsAndTitle(@Param("skills") List<Skill> skills,@Param("title") String title,@Param("max") Long max,@Param("min") Long min,@Param("delai") int delai,Pageable pageable);
+
+
+
+
+
+
+
 
 
 }

@@ -12,22 +12,19 @@ import java.util.Set;
 public class Skill extends DateAudit {
 
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @NotBlank
-    @NaturalId
-    private String name;
-
     @JsonIgnore
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "skills")
     Set<Freelancer> freelancers = new HashSet();
-
     @JsonIgnore
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL,
             mappedBy = "skills")
     Set<Job> jobs = new HashSet<>();
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    @NotBlank
+    @NaturalId
+    private String name;
 
     public Skill() {
 

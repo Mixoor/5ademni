@@ -9,11 +9,11 @@ public class ContractResponse {
     private String title;
     private String content;
 
-    private String budget;
-    private String delay;
+    private Long budget;
+    private int delay;
 
 
-    public ContractResponse(UserSummary client, UserSummary freelancer, String title, String content, String budget, String delay) {
+    public ContractResponse(UserSummary client, UserSummary freelancer, String title, String content, Long budget, int delay) {
         this.client = client;
         this.freelancer = freelancer;
         this.title = title;
@@ -54,19 +54,19 @@ public class ContractResponse {
         this.content = content;
     }
 
-    public String getBudget() {
+    public Long getBudget() {
         return budget;
     }
 
-    public void setBudget(String budget) {
+    public void setBudget(Long budget) {
         this.budget = budget;
     }
 
-    public String getDelay() {
+    public int getDelay() {
         return delay;
     }
 
-    public void setDelay(String delay) {
+    public void setDelay(int delay) {
         this.delay = delay;
     }
 }

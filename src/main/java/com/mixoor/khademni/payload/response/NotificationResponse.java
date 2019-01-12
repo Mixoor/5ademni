@@ -2,14 +2,21 @@ package com.mixoor.khademni.payload.response;
 
 public class NotificationResponse {
 
-     Long id;
-     UserSummary userSummary;
-     String description;
+    private Long id;
+    private UserSummary sender;
 
-    public NotificationResponse(Long id, UserSummary userSummary, String description) {
+    private String description;
+    private String url;
+
+    private int status;
+
+
+    public NotificationResponse(Long id, UserSummary sender, String description, String url, int status) {
         this.id = id;
-        this.userSummary = userSummary;
+        this.sender = sender;
         this.description = description;
+        this.url = url;
+        this.status = status;
     }
 
     public Long getId() {
@@ -20,12 +27,12 @@ public class NotificationResponse {
         this.id = id;
     }
 
-    public UserSummary getUserSummary() {
-        return userSummary;
+    public UserSummary getSender() {
+        return sender;
     }
 
-    public void setUserSummary(UserSummary userSummary) {
-        this.userSummary = userSummary;
+    public void setSender(UserSummary sender) {
+        this.sender = sender;
     }
 
     public String getDescription() {
@@ -34,5 +41,21 @@ public class NotificationResponse {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
     }
 }

@@ -28,36 +28,31 @@ public class SkillController {
     UserService userService;
 
     @GetMapping("/skills")
-    public List<Skill> getSkills(@CurrentUser UserPrincipal userPrincipal){
+    public List<Skill> getSkills(@CurrentUser UserPrincipal userPrincipal) {
         List<Skill> skills = skillRepository.findAll();
         return skills;
     }
 
     @PostMapping("/skill")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<?> createSkill(@CurrentUser UserPrincipal userPrincipal, @Valid SkillRequest skillRequest){
-        Skill skill = new ModelMapper().mapRequestToSkill(skillRequest);
+    public ResponseEntity<?> createSkill(@CurrentUser UserPrincipal userPrincipal, @Valid SkillRequest skillRequest) {
+        Skill skill = ModelMapper.mapRequestToSkill(skillRequest);
 
         skillRepository.save(skill);
 
-        return ResponseEntity.ok().body(new ApiResponse(true,"Skill created successfully"));
+        return ResponseEntity.ok().body(new ApiResponse(true, "Skill created successfully"));
     }
 
     @DeleteMapping("/skill")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<?> deleteSkill(@CurrentUser UserPrincipal userPrincipal, @Valid SkillRequest skillRequest){
+    public ResponseEntity<?> deleteSkill(@CurrentUser UserPrincipal userPrincipal, @Valid SkillRequest skillRequest) {
         Skill skill = skillRepository.findByName(skillRequest.getName())
-                .orElseThrow(()-> new BadRequestException("Skill doesn't exist "));
+                .orElseThrow(() -> new BadRequestException("Skill doesn't exist "));
 
         skillRepository.delete(skill);
 
-        return ResponseEntity.ok().body(new ApiResponse(true,"Skill deleted successfully"));
+        return ResponseEntity.ok().body(new ApiResponse(true, "Skill deleted successfully"));
     }
-
-
-
-
-
 
 
 }

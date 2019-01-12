@@ -25,12 +25,12 @@ public class UserPrincipal implements UserDetails {
     private Collection<? extends GrantedAuthority> authorities;
 
 
-    public UserPrincipal(Long id, String nameUser,String email, String password, String picture, Collection<? extends GrantedAuthority> authorities) {
+    public UserPrincipal(Long id, String nameUser, String email, String password, String picture, Collection<? extends GrantedAuthority> authorities) {
         this.id = id;
         //this will be used in the websocket as identifiant
         this.name = String.valueOf(id);
         this.email = email;
-        this.nameUser=nameUser;
+        this.nameUser = nameUser;
         this.password = password;
         this.picture = picture;
         this.authorities = authorities;

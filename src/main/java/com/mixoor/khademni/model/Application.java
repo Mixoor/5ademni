@@ -25,15 +25,15 @@ public class Application {
 
     @Column(name = "create_on")
     @Temporal(TemporalType.DATE)
-    private Date creationOn=new Date();
+    private Date creationOn = new Date();
 
 
-
-    private String  budget;
+    private String budget;
 
     private String time;
 
-    public Application(ApplicationId applicationId, Freelancer freelancer, Job job, String content, String budget, String time){}
+    public Application(ApplicationId applicationId, Freelancer freelancer, Job job, String content, String budget, String time) {
+    }
 
     public Application(ApplicationId id, @NotBlank String content, Date creationOn) {
         this.id = id;

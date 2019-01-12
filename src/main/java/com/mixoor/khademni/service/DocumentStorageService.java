@@ -3,7 +3,10 @@ package com.mixoor.khademni.service;
 
 import com.mixoor.khademni.exception.BadRequestException;
 import com.mixoor.khademni.exception.ResourceNotFoundException;
-import com.mixoor.khademni.model.*;
+import com.mixoor.khademni.model.Client;
+import com.mixoor.khademni.model.Document;
+import com.mixoor.khademni.model.Job;
+import com.mixoor.khademni.model.User;
 import com.mixoor.khademni.payload.response.UploadFileResponse;
 import com.mixoor.khademni.property.FileProperties;
 import com.mixoor.khademni.repository.DocumentRepository;
@@ -41,7 +44,7 @@ public class DocumentStorageService {
     }
 
 
-    public String DownloadLink(String filename){
+    public String DownloadLink(String filename) {
         return ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path("/downloadFile/")
                 .path(filename)
@@ -59,11 +62,10 @@ public class DocumentStorageService {
 
             Path targetLocation = this.fileStorageLocation.resolve(fileName);
             Files.copy(multipartFile.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
-            String fileDownloadUri =DownloadLink(fileName);
+            String fileDownloadUri = DownloadLink(fileName);
 
             return new UploadFileResponse(fileName, fileDownloadUri,
                     multipartFile.getContentType(), multipartFile.getSize());
-
 
 
         } catch (IOException e) {
@@ -88,25 +90,19 @@ public class DocumentStorageService {
     }
 
 
-    public Document documentToJob(UploadFileResponse response, Client client, Job job){
-            Document document =new Document(response.getFileName(),response.getFileType());
-            document.setUser(client);
-            document.setJob(job);
-            documentRepository.save(document);
-            return document;
-    }
-
-    public Message documentToMessage(UploadFileResponse response , Message message){
-        Document document = new Document(response.getFileName(),response.getFileType());
-        document.setUser(message.getSender());
+    public Document documentToJob(UploadFileResponse response, Client client, Job job) {
+        Document document = new Document(response.getFileName(), response.getFileType()
+                , client, job, response.getSize());
         documentRepository.save(document);
-        message.setMessage(response.getFileName()+'.'+response.getFileType());
-        message.setDocument(document);
-        return message;
+        return document;
     }
 
+    public Document documentToMessage(UploadFileResponse response, User userPrincipal) {
 
-
+        Document document = new Document(response.getFileName(), response.getFileType(), userPrincipal, response.getSize());
+        documentRepository.save(document);
+        return document;
+    }
 
 
 }

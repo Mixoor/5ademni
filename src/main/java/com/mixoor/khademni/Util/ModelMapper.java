@@ -15,16 +15,16 @@ public class ModelMapper {
 
 
     @Autowired
-    private DocumentStorageService documentStorageService;
+    private static  DocumentStorageService documentStorageService;
 
     @Autowired
-    private SkillRepository skillRepository;
+    private static  SkillRepository skillRepository;
 
     @Autowired
-    private DocumentRepository documentRepository;
+    private static  DocumentRepository documentRepository;
 
 
-    public Job mapJobRequestToJob(JobRequest jobRequest, Client client) {
+    public static  Job mapJobRequestToJob(JobRequest jobRequest, Client client) {
 
         Job job = new Job();
 
@@ -32,7 +32,7 @@ public class ModelMapper {
         job.setTitle(jobRequest.getTitle());
         job.setContent(jobRequest.getDescription());
         job.setDelai(jobRequest.getDelai());
-        job.setBudget(Long.parseLong(jobRequest.getBudget()));
+        job.setBudget(jobRequest.getBudget());
         job.setClient(client);
 
 
@@ -61,7 +61,7 @@ public class ModelMapper {
 
     }
 
-    public JobResponse mapJobtoJobResponse(Job job, Client client) {
+    public static  JobResponse mapJobtoJobResponse(Job job, Client client) {
 
         UserSummary userSummary = mapClientUserSummary(client);
 
@@ -71,21 +71,21 @@ public class ModelMapper {
 
         List<UploadFileResponse> files = documentRepository.findByJob(job).stream()
                 .map(document -> new UploadFileResponse(document.getId()
-                        ,document.getFileName(),
+                        , document.getFileName(),
                         document.getFileType(),
-                        documentStorageService.DownloadLink(document.getFileName()+document.getFileType()),
+                        documentStorageService.DownloadLink(document.getFileName() + document.getFileType()),
                         document.getSize()))
                 .collect(Collectors.toList());
 
         JobResponse jobResponse = new JobResponse(job.getId(), job.getTitle()
-                , job.getContent(), String.valueOf(job.getBudget()), job.getDelai()
-                , job.isAvailble(), userSummary, job.getCreatedAt(), skillResponse,files);
+                , job.getContent(), job.getBudget(), job.getDelai()
+                , job.isAvailble(), userSummary, job.getCreatedAt(), skillResponse, files);
 
         return jobResponse;
     }
 
 
-    public UserSummary mapClientUserSummary(Client client) {
+    public static  UserSummary mapClientUserSummary(Client client) {
 
         UserSummary userSummary = new UserSummary(client.getId(), client.getName()
                 , client.getPath(), client.getScore(), "Client");
@@ -94,7 +94,7 @@ public class ModelMapper {
 
     }
 
-    public UserSummary mapFreelancerToUserSummary(Freelancer freelancer) {
+    public static  UserSummary mapFreelancerToUserSummary(Freelancer freelancer) {
 
         UserSummary userSummary = new UserSummary(freelancer.getId(), freelancer.getName()
                 , freelancer.getPath(), freelancer.getRating(), "Freelancer");
@@ -103,7 +103,7 @@ public class ModelMapper {
 
     }
 
-    public UserSummary mapUserToUserSummary(User user) {
+    public static  UserSummary mapUserToUserSummary(User user) {
 
         if (user instanceof Client)
             return mapClientUserSummary((Client) user);
@@ -117,19 +117,19 @@ public class ModelMapper {
     }
 
 
-    public ContractResponse mapJobToContract(Job job) {
+    public static  ContractResponse mapJobToContract(Job job) {
 
         UserSummary freelancerUserSummary = mapFreelancerToUserSummary(job.getFreelancer());
         UserSummary clientUserSummary = mapClientUserSummary(job.getClient());
 
         return new ContractResponse(clientUserSummary, freelancerUserSummary
                 , job.getTitle(), job.getContent()
-                , String.valueOf(job.getBudget()), job.getDelai());
+                , job.getBudget(), job.getDelai());
 
     }
 
 
-    public Application mapRequestToApplication(ApplicationRequest applicationRequest, Freelancer freelancer, Job job) {
+    public static  Application mapRequestToApplication(ApplicationRequest applicationRequest, Freelancer freelancer, Job job) {
 
         Application application = new Application(new ApplicationId(applicationRequest.getFreelancerId(), applicationRequest.getJobId())
                 , freelancer, job, applicationRequest.getContent(), applicationRequest.getBudget(), applicationRequest.getTime());
@@ -137,7 +137,7 @@ public class ModelMapper {
         return application;
     }
 
-    public ApplicationResponse mapApplicationToResponse(User freelancer, Application application) {
+    public static  ApplicationResponse mapApplicationToResponse(User freelancer, Application application) {
 
         ApplicationResponse applicationResponse =
                 new ApplicationResponse(application.getJob().getId(), application.getFreelancer().getId(), mapFreelancerToUserSummary((Freelancer) freelancer), application.getContent()
@@ -146,13 +146,13 @@ public class ModelMapper {
     }
 
 
-    public Comment mapRequestToComment(CommentRequest commentRequest, Post post, User user) {
+    public static  Comment mapRequestToComment(CommentRequest commentRequest, Post post, User user) {
 
         Comment comment = new Comment(user, post, commentRequest.getContent());
         return comment;
     }
 
-    public CommentResponse mapCommentToResponse(Comment comment, User user) {
+    public static  CommentResponse mapCommentToResponse(Comment comment, User user) {
         UserSummary commentaire = null;
         if (user instanceof Client)
             commentaire = mapClientUserSummary((Client) user);
@@ -163,14 +163,14 @@ public class ModelMapper {
     }
 
 
-    public Post mapResquestToPost(PostRequest postRequest, User user) {
+    public static  Post mapResquestToPost(PostRequest postRequest, User user) {
 
         Post post = new Post(postRequest.getTitle(), postRequest.getContent(), postRequest.getCover(),
                 postRequest.getCategories(), user);
         return post;
     }
 
-    public PostResponse mapPostToResponse(Post post, long comment, User user) {
+    public static  PostResponse mapPostToResponse(Post post, long comment, User user) {
 
         UserSummary userSummary = mapUserToUserSummary(user);
         return new PostResponse(post.getId(), post.getTitle(), post.getContent(), post.getCategorie()
@@ -178,33 +178,33 @@ public class ModelMapper {
     }
 
 
-    public Project mapRequestToProject(ProjectRequest projectRequest, User user) {
+    public static  Project mapRequestToProject(ProjectRequest projectRequest, User user) {
 
         Project project = new Project(projectRequest.getTitle(), projectRequest.getContent(), user);
         return project;
     }
 
-    public ProjectResponse mapProjectToResponse(Project project, long c) {
+    public static  ProjectResponse mapProjectToResponse(Project project, long c) {
         UserSummary userSummary = mapUserToUserSummary(project.getCreated());
         return new ProjectResponse(project.getId(), project.getTitle(), project.getContent()
                 , project.getCreatedAt(), c, userSummary);
 
     }
 
-    public SkillResponse mapSkillToResponse(Skill skill) {
+    public static  SkillResponse mapSkillToResponse(Skill skill) {
         return new SkillResponse(skill.getName());
     }
 
-    public Skill mapRequestToSkill(SkillRequest skillRequest) {
+    public static  Skill mapRequestToSkill(SkillRequest skillRequest) {
         return new Skill(skillRequest.getName());
     }
 
-    public ExperienceResponse mapExperienceToResponse(Freelancer freelancer, Experience experience) {
+    public static  ExperienceResponse mapExperienceToResponse(Freelancer freelancer, Experience experience) {
         return new ExperienceResponse(experience.getId(), experience.getCompanyName(), experience.getStartDate()
                 , experience.getEndDate(), experience.getDescription(), experience.getPosition(), mapFreelancerToUserSummary(freelancer));
     }
 
-    public UserProfile mapUserToProfile(User user) {
+    public static  UserProfile mapUserToProfile(User user) {
 
         if (user instanceof Freelancer) {
             Freelancer freelancer = (Freelancer) user;
@@ -220,31 +220,31 @@ public class ModelMapper {
 
     }
 
-    public LanguageResponse mapLanguageToResponse(Language language) {
+    public static  LanguageResponse mapLanguageToResponse(Language language) {
         return new LanguageResponse(language.getName());
     }
 
-    public TicketResponse mapTicketToResponse(Ticket ticket){
-        UserSummary userSummary= mapUserToUserSummary(ticket.getUser());
-        return new TicketResponse(ticket.getId(),ticket.getSubject(),ticket.getContent(),
+    public static  TicketResponse mapTicketToResponse(Ticket ticket) {
+        UserSummary userSummary = mapUserToUserSummary(ticket.getUser());
+        return new TicketResponse(ticket.getId(), ticket.getSubject(), ticket.getContent(),
                 userSummary);
     }
 
-    public Ticket mapRequestToTicket(User user,TicketRequest ticketRequest){
-        return new Ticket(ticketRequest.getSubject(),ticketRequest.getContent(),user);
+    public static  Ticket mapRequestToTicket(User user, TicketRequest ticketRequest) {
+        return new Ticket(ticketRequest.getSubject(), ticketRequest.getContent(), user);
     }
 
 
-   public Conversation mapResquestToConversation(ConversationRequest request , User user1,User user2 ){
+    public static  Conversation mapResquestToConversation(ConversationRequest request, User user1, User user2) {
         return new Conversation(
-               user1, user2,
+                user1, user2,
                 0
 
         );
-   }
+    }
 
 
-    public ConversationResponse mapConversationToResponse(Conversation conversation){
+    public static  ConversationResponse mapConversationToResponse(Conversation conversation) {
         return new ConversationResponse(conversation.getId(),
                 mapUserToUserSummary(conversation.getUser1()),
                 mapUserToUserSummary(conversation.getUser2()),
@@ -253,25 +253,36 @@ public class ModelMapper {
         );
     }
 
-    public MessageResponse mapMessageToResponse( Message message){
-            return new MessageResponse(
-                    message.getId(),
-                    mapUserToUserSummary(message.getSender()),
-                    message.getMessage(),mapConversationToResponse(message.getConversation()),message.getDocument().getFileName()+message.getDocument().getFileType(),
-                    message.getStatus()
-            );
+    public static  MessageResponse mapMessageToResponse(Message message) {
+        return new MessageResponse(
+                message.getId(),
+                mapUserToUserSummary(message.getSender()),
+                message.getMessage(), mapConversationToResponse(message.getConversation()), message.getDocument().getFileName() + message.getDocument().getFileType(),
+                message.getStatus()
+        );
     }
 
 
-    public Message mapRequestToMessage(MessageRequest request ,Document document,User user,Conversation  conversation ,int s ){
-            return  new Message(
-                    request.getContent(),
-                    s,
-                    user,
-                    document,
-                    conversation
+    public static  Message mapRequestToMessage(MessageRequest request, Document document, User sender, User receiver, Conversation conversation, int s) {
+        return new Message(
+                request.getContent(),
+                s,
+                sender,
+                receiver,
+                document,
+                conversation
 
-            );
+        );
+    }
+
+    public static  NotificationResponse mapResponseFromNotification(Notification notification) {
+
+        return new NotificationResponse(notification.getId(),
+                mapUserToUserSummary(notification.getSender()),
+                notification.getDescription(),
+                notification.getUrl(),
+                notification.getIsRead()
+        );
     }
 
 }

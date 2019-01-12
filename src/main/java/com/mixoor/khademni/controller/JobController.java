@@ -3,9 +3,7 @@ package com.mixoor.khademni.controller;
 import com.mixoor.khademni.Util.AppConstants;
 import com.mixoor.khademni.config.CurrentUser;
 import com.mixoor.khademni.config.UserPrincipal;
-import com.mixoor.khademni.exception.ResourceNotFoundException;
 import com.mixoor.khademni.model.Job;
-import com.mixoor.khademni.model.User;
 import com.mixoor.khademni.payload.request.JobRequest;
 import com.mixoor.khademni.payload.response.ApiResponse;
 import com.mixoor.khademni.payload.response.ContractResponse;
@@ -117,7 +115,7 @@ public class JobController {
     @PostMapping("/job/{id}")
     @PreAuthorize("hasRole('ROLE_CLIENT')")
     public ResponseEntity<?> setFreelancerAndClose(@CurrentUser UserPrincipal userPrincipal, @PathVariable(value = "id") Long id,
-                                                    Long freelancer) {
+                                                   Long freelancer) {
         jobService.setFreelancerAndClose(id, freelancer);
         return ResponseEntity.ok().body(new ApiResponse(true, "Update finish successfully"));
 
@@ -127,7 +125,7 @@ public class JobController {
     @PutMapping("/job/{id}")
     @PreAuthorize("hasRole('ROLE_CLIENT')")
     public Job updateJob(@CurrentUser UserPrincipal userPrincipal, @PathVariable Long id, @Valid JobRequest job) {
-        return  jobService.UpdateJob(userPrincipal,job);
+        return jobService.UpdateJob(userPrincipal, job);
 
     }
 

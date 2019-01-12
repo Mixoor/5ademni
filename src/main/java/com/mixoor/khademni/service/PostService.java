@@ -43,10 +43,10 @@ public class PostService {
         User user = userRepository.findById(current.getId())
                 .orElseThrow(() -> new BadRequestException("User id invalid "));
 
-        Post post = new ModelMapper().mapResquestToPost(postRequest, user);
+        Post post = ModelMapper.mapResquestToPost(postRequest, user);
         postRepository.save(post);
 
-        return new ModelMapper().mapPostToResponse(post, 0L, user);
+        return ModelMapper .mapPostToResponse(post, 0L, user);
 
     }
 
@@ -55,15 +55,12 @@ public class PostService {
         User user = userRepository.findById(current.getId())
                 .orElseThrow(() -> new BadRequestException("User id invalid "));
 
-        Post post = new ModelMapper().mapResquestToPost(postRequest, user);
+        Post post = ModelMapper .mapResquestToPost(postRequest, user);
         postRepository.save(post);
 
-        return new ModelMapper().mapPostToResponse(post, 0L, user);
+        return ModelMapper.mapPostToResponse(post, 0L, user);
 
     }
-
-
-
 
 
     public PagedResponse<PostResponse> getPosts(int page, int size) {
@@ -78,7 +75,7 @@ public class PostService {
 
         List<PostResponse> postResponses = posts.stream().map((post) -> {
             long commentaries = commentRepository.countAllByPost(post);
-            return new ModelMapper().mapPostToResponse(post, commentaries, post.getUser());
+            return ModelMapper .mapPostToResponse(post, commentaries, post.getUser());
         }).collect(Collectors.toList());
 
         return new PagedResponse<PostResponse>(postResponses, posts.getNumber(), posts.getSize()
@@ -91,7 +88,7 @@ public class PostService {
                 .orElseThrow(() -> new BadRequestException("Post with id " + id + " is not valid"));
 
         long comments = commentRepository.countByPost(post);
-        return new ModelMapper().mapPostToResponse(post, comments, post.getUser());
+        return ModelMapper .mapPostToResponse(post, comments, post.getUser());
 
     }
 
@@ -101,10 +98,10 @@ public class PostService {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() ->
                         new BadRequestException("Post with id " + postId + " doesnt exist"));
-        Comment comment = new ModelMapper().mapRequestToComment(commentRequest, post, user);
+        Comment comment = ModelMapper .mapRequestToComment(commentRequest, post, user);
         commentRepository.save(comment);
         long commentCount = commentRepository.countByPost(post);
-        return new ModelMapper().mapCommentToResponse(comment, user);
+        return ModelMapper .mapCommentToResponse(comment, user);
     }
 
     public CommentResponse updateComment(UserPrincipal current, Long postId, CommentRequest commentRequest) {
@@ -115,7 +112,7 @@ public class PostService {
         comment.setContent(commentRequest.getContent());
         commentRepository.save(comment);
 
-        return new ModelMapper().mapCommentToResponse(comment, comment.getUser());
+        return ModelMapper .mapCommentToResponse(comment, comment.getUser());
     }
 
     public PagedResponse<CommentResponse> getComments(Long id, int page, int size) {
@@ -131,7 +128,7 @@ public class PostService {
                     , comments.isLast());
 
         List<CommentResponse> commentResponses = comments.stream().map((comment) ->
-                new ModelMapper().mapCommentToResponse(comment, comment.getUser())
+                ModelMapper .mapCommentToResponse(comment, comment.getUser())
         ).collect(Collectors.toList());
 
         return new PagedResponse<CommentResponse>(commentResponses, comments.getNumber(), comments.getSize()

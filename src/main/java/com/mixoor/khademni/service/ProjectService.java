@@ -42,10 +42,10 @@ public class ProjectService {
 
         User user = userRepository.findById(userPrincipal.getId()).orElseThrow(() -> new BadRequestException("User doesn't exist"));
 
-        Project project = new ModelMapper().mapRequestToProject(projectRequest, user);
+        Project project = ModelMapper .mapRequestToProject(projectRequest, user);
         projectRepository.save(project);
 
-        return new ModelMapper().mapProjectToResponse(project, voteRepository.countByProject(project.getId()));
+        return ModelMapper .mapProjectToResponse(project, voteRepository.countByProject(project.getId()));
 
     }
 
@@ -60,7 +60,7 @@ public class ProjectService {
                     , projects.getSize(), projects.getTotalElements(), projects.getTotalPages()
                     , projects.isLast());
 
-        List<ProjectResponse> projectResponses = projects.stream().map((p) -> new ModelMapper().mapProjectToResponse(p, voteRepository.countByProject(p.getId()))
+        List<ProjectResponse> projectResponses = projects.stream().map((p) -> ModelMapper .mapProjectToResponse(p, voteRepository.countByProject(p.getId()))
         ).collect(Collectors.toList());
 
         return new PagedResponse<ProjectResponse>(projectResponses, projects.getNumber(), projects.getSize()
@@ -72,7 +72,7 @@ public class ProjectService {
     private ProjectResponse getProjectById(Long id) {
         Project project = projectRepository.findById(id)
                 .orElseThrow(() -> new BadRequestException("Project doesn't exist"));
-        return new ModelMapper().mapProjectToResponse(project, voteRepository.countByProject(id));
+        return ModelMapper .mapProjectToResponse(project, voteRepository.countByProject(id));
 
     }
 

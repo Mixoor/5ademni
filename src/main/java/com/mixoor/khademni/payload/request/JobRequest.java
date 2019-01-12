@@ -10,15 +10,15 @@ public class JobRequest {
     private Long userId;
     private String title;
     private String description;
-    private String budget;
-    private String delai;
+    private Long budget;
+    private int delai;
     private List<MultipartFile> files;
     private List<String> skills;
 
     public JobRequest() {
     }
 
-    public JobRequest(Long userId, String title, String description, String budget, String delai, List<MultipartFile> files, List<String> skills) {
+    public JobRequest(Long userId, String title, String description, Long budget, int delai, List<MultipartFile> files, List<String> skills) {
         this.userId = userId;
         this.title = title;
         this.description = description;
@@ -52,19 +52,19 @@ public class JobRequest {
         this.description = description;
     }
 
-    public String getBudget() {
+    public Long getBudget() {
         return budget;
     }
 
-    public void setBudget(String budget) {
+    public void setBudget(Long budget) {
         this.budget = budget;
     }
 
-    public String getDelai() {
+    public int getDelai() {
         return delai;
     }
 
-    public void setDelai(String delai) {
+    public void setDelai(int delai) {
         this.delai = delai;
     }
 

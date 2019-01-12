@@ -2,7 +2,6 @@ package com.mixoor.khademni.model;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
-import java.time.Instant;
 
 @Entity
 public class Review extends DateAudit {
@@ -33,12 +32,12 @@ public class Review extends DateAudit {
     @NotBlank
     private int rate;
 
-    public Review(ReviewId id, User client, User freelancer, @NotBlank String title,@NotBlank String message, @NotBlank int rate) {
+    public Review(ReviewId id, User client, User freelancer, @NotBlank String title, @NotBlank String message, @NotBlank int rate) {
         this.id = id;
         this.client = client;
         this.freelancer = freelancer;
         this.message = message;
-        this.title=title;
+        this.title = title;
         this.rate = rate;
     }
 

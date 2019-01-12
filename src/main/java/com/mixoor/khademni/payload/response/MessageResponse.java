@@ -15,7 +15,7 @@ public class MessageResponse {
 
     private String attachment;
 
-    private  int status;
+    private int status;
 
 
     public MessageResponse(Long id, UserSummary sender, String content, ConversationResponse conversation, String attachment, int status) {

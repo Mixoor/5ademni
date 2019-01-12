@@ -12,7 +12,7 @@ public class Notification extends DateAudit {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-       private Long id;
+    private Long id;
 
     @NotBlank
     private String description;
@@ -20,14 +20,48 @@ public class Notification extends DateAudit {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "sender_id", nullable = false)
     @JsonIgnore
-    private User user;
+    private User receiver;
 
-    public Notification(Long id, @NotBlank String description, User user) {
-        this.id = id;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(name = "receiver_id", nullable = false)
+    @JsonIgnore
+    private User sender;
+
+    @Enumerated(EnumType.STRING)
+    private NotificationType type;
+
+    private String url;
+
+    private int isRead;
+
+
+    public Notification(@NotBlank String description, User receiver, User sender, NotificationType type, String url, int isRead) {
         this.description = description;
-        this.user = user;
+        this.receiver = receiver;
+        this.sender = sender;
+        this.type = type;
+        this.url = url;
+        this.isRead = isRead;
+    }
+
+
+    public NotificationType getType() {
+        return type;
+    }
+
+    public void setType(NotificationType type) {
+        this.type = type;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
     }
 
     public Long getId() {
@@ -46,11 +80,27 @@ public class Notification extends DateAudit {
         this.description = description;
     }
 
-    public User getUser() {
-        return user;
+    public User getReceiver() {
+        return receiver;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setReceiver(User receiver) {
+        this.receiver = receiver;
+    }
+
+    public User getSender() {
+        return sender;
+    }
+
+    public void setSender(User sender) {
+        this.sender = sender;
+    }
+
+    public int getIsRead() {
+        return isRead;
+    }
+
+    public void setIsRead(int isRead) {
+        this.isRead = isRead;
     }
 }

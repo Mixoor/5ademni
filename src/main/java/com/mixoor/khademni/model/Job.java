@@ -23,9 +23,11 @@ public class Job extends DateAudit {
     @NotBlank
     private Long budget;
     @NotBlank
-    private String delai;
+    private int  delai;
 
     private boolean availble = true;
+
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "freelancer_id")
     private Freelancer freelancer;
@@ -54,7 +56,7 @@ public class Job extends DateAudit {
         this.availble = true;
     }
 
-    public Job(@NotBlank String title, @NotBlank String content, @NotBlank Long budget, @NotBlank String delai, boolean availble, Client client) {
+    public Job(@NotBlank String title, @NotBlank String content, @NotBlank Long budget, @NotBlank int  delai, boolean availble, Client client) {
         this.title = title;
         this.content = content;
         this.budget = budget;
@@ -104,11 +106,11 @@ public class Job extends DateAudit {
         this.budget = budget;
     }
 
-    public String getDelai() {
+    public int  getDelai() {
         return delai;
     }
 
-    public void setDelai(String delai) {
+    public void setDelai(int  delai) {
         this.delai = delai;
     }
 

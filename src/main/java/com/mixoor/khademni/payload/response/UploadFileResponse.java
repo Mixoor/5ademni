@@ -9,7 +9,7 @@ public class UploadFileResponse {
     private long size;
 
 
-    public UploadFileResponse( String fileName, String fileDownloadUri, String fileType, long size) {
+    public UploadFileResponse(String fileName, String fileDownloadUri, String fileType, long size) {
         this.fileName = fileName;
         this.fileDownloadUri = fileDownloadUri;
         this.fileType = fileType;

@@ -7,7 +7,7 @@ public class ReviewResponse {
     private int rate;
     private String title;
 
-    public ReviewResponse(UserSummary client, String title,String message, int rate) {
+    public ReviewResponse(UserSummary client, String title, String message, int rate) {
         this.client = client;
         this.message = message;
         this.rate = rate;

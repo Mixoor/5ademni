@@ -5,11 +5,15 @@ import com.mixoor.khademni.Util.AppConstants;
 import com.mixoor.khademni.config.CurrentUser;
 import com.mixoor.khademni.config.UserPrincipal;
 import com.mixoor.khademni.exception.BadRequestException;
+import com.mixoor.khademni.exception.UnauthorizedException;
+import com.mixoor.khademni.model.Comment;
+import com.mixoor.khademni.model.Post;
 import com.mixoor.khademni.payload.request.CommentRequest;
 import com.mixoor.khademni.payload.response.ApiResponse;
 import com.mixoor.khademni.payload.response.CommentResponse;
 import com.mixoor.khademni.payload.response.PagedResponse;
 import com.mixoor.khademni.repository.CommentRepository;
+import com.mixoor.khademni.repository.PostRepository;
 import com.mixoor.khademni.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +33,9 @@ public class CommentController {
     @Autowired
     CommentRepository commentRepository;
 
+    @Autowired
+    PostRepository postRepository;
+
 
     @GetMapping("/comments/{id}")
     @PreAuthorize("isAuthenticated()")
@@ -41,20 +48,41 @@ public class CommentController {
     @PostMapping("/comments/{id}")
     @PreAuthorize("isAuthenticated()")
     public CommentResponse addComment(@CurrentUser UserPrincipal user, @PathVariable(value = "id") Long id, @Valid CommentRequest commentRequest) {
+        Post post= postRepository.findById(id).orElseThrow(() ->
+                new BadRequestException("Post doesn't exist "));
+
+        if(user.getId()!= post.getUser().getId())
+            throw new UnauthorizedException("you can't delete what its not yours begone  ");
+
+
+
         return postService.addComment(user, id, commentRequest);
     }
 
     @PutMapping("/comments/{id}")
     @PreAuthorize("isAuthenticated()")
     public CommentResponse updateComment(@CurrentUser UserPrincipal user, @PathVariable(value = "id") Long id, @Valid CommentRequest commentRequest) {
+
+        Comment comment= commentRepository.findById(id).orElseThrow(() ->
+                new BadRequestException("Comment doesn't exist "));
+
+        if(user.getId()!= comment.getUser().getId())
+            throw new UnauthorizedException("you can't delete what its not yours begone  ");
+
+
         return postService.updateComment(user, id, commentRequest);
     }
 
     @DeleteMapping("/comments/{id}")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> deleteComment(@CurrentUser UserPrincipal user, @PathVariable(value = "id") Long id, @Valid CommentRequest commentRequest) {
-        commentRepository.delete(commentRepository.findById(id).orElseThrow(() ->
-                new BadRequestException("Comment doesn't exist ")));
+        Comment comment= commentRepository.findById(id).orElseThrow(() ->
+                new BadRequestException("Comment doesn't exist "));
+
+        if(user.getId()!= comment.getUser().getId())
+            throw new UnauthorizedException("you can't delete what its not yours begone  ");
+
+       commentRepository.delete(comment);
 
         return ResponseEntity.ok().body(new ApiResponse(true, "Comment deleted with successfully"));
     }

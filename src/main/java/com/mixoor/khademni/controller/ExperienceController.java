@@ -35,50 +35,50 @@ public class ExperienceController {
 
 
     @GetMapping("exp/{id}")
-    public PagedResponse<ExperienceResponse> getExperiences(@CurrentUser UserPrincipal userPrincipal , @PathVariable(value = "id")Long id,
-                                                            @RequestParam(value = "page",defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
-                                                            @RequestParam(value = "size",defaultValue = AppConstants.DEFAULT_PAGE_SIZE)int size){
-        Freelancer freelancer=freelancerRepository.findById(id)
-                .orElseThrow(()-> new BadRequestException("Freelancer doesn't exist"));
-        return userService.getAllExperience(freelancer,page,size);
+    public PagedResponse<ExperienceResponse> getExperiences(@CurrentUser UserPrincipal userPrincipal, @PathVariable(value = "id") Long id,
+                                                            @RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
+                                                            @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size) {
+        Freelancer freelancer = freelancerRepository.findById(id)
+                .orElseThrow(() -> new BadRequestException("Freelancer doesn't exist"));
+        return userService.getAllExperience(freelancer, page, size);
     }
 
     @PostMapping("/exp")
     @PreAuthorize("hasRole('ROLE_FREELANCER')")
     public ExperienceResponse createExp(@CurrentUser UserPrincipal principal,
-                                        @Valid ExperienceRequest request){
-        Freelancer freelancer=freelancerRepository.findById(principal.getId())
-                .orElseThrow(()-> new BadRequestException("Freelancer doesn't exist ")) ;
-        return userService.addExperience(freelancer,request);
+                                        @Valid ExperienceRequest request) {
+        Freelancer freelancer = freelancerRepository.findById(principal.getId())
+                .orElseThrow(() -> new BadRequestException("Freelancer doesn't exist "));
+        return userService.addExperience(freelancer, request);
     }
 
     @DeleteMapping("/exp/{id}")
     @PreAuthorize("hasRole('ROLE_FREELANCER')")
-    public ResponseEntity<?> removeExp(@CurrentUser UserPrincipal principal,@PathVariable(value = "id") Long id){
-        Freelancer freelancer=freelancerRepository.findById(principal.getId())
-                .orElseThrow(()-> new BadRequestException("Freelancer doesn't exist ")) ;
+    public ResponseEntity<?> removeExp(@CurrentUser UserPrincipal principal, @PathVariable(value = "id") Long id) {
+        Freelancer freelancer = freelancerRepository.findById(principal.getId())
+                .orElseThrow(() -> new BadRequestException("Freelancer doesn't exist "));
 
-        Experience experience=experienceRepository.findById(id)
-                .orElseThrow(()-> new BadRequestException("Experience doesn't exist "));
+        Experience experience = experienceRepository.findById(id)
+                .orElseThrow(() -> new BadRequestException("Experience doesn't exist "));
 
-        if (experience.getFreelancer().getId()==freelancer.getId()){
+        if (experience.getFreelancer().getId() == freelancer.getId()) {
             userService.removeExperience(experience);
-            return ResponseEntity.ok().body(new ApiResponse(true,"Experience removed successfully"));
+            return ResponseEntity.ok().body(new ApiResponse(true, "Experience removed successfully"));
         }
-        return ResponseEntity.ok().body( new ApiResponse(false,"Erreur "));
+        return ResponseEntity.ok().body(new ApiResponse(false, "Erreur "));
     }
 
     @PutMapping("/exp/{id}")
     @PreAuthorize("hasRole('ROLE_FREELANCER')")
-    public Experience updateExp(@CurrentUser UserPrincipal principal,@PathVariable(value = "id") Long id,
-                                       @Valid ExperienceRequest request){
-        Freelancer freelancer=freelancerRepository.findById(principal.getId())
-                .orElseThrow(()-> new BadRequestException("Freelancer doesn't exist ")) ;
+    public Experience updateExp(@CurrentUser UserPrincipal principal, @PathVariable(value = "id") Long id,
+                                @Valid ExperienceRequest request) {
+        Freelancer freelancer = freelancerRepository.findById(principal.getId())
+                .orElseThrow(() -> new BadRequestException("Freelancer doesn't exist "));
 
-        Experience experience=experienceRepository.findById(id)
-                .orElseThrow(()-> new BadRequestException("Experience doesn't exist "));
+        Experience experience = experienceRepository.findById(id)
+                .orElseThrow(() -> new BadRequestException("Experience doesn't exist "));
 
-        if (experience.getFreelancer().getId()==freelancer.getId()){
+        if (experience.getFreelancer().getId() == freelancer.getId()) {
             experience.setCompanyName(request.getCompanyName());
             experience.setDescription(request.getDescription());
             experience.setEndDate(request.getEndDate());
@@ -87,6 +87,6 @@ public class ExperienceController {
 
             return experienceRepository.save(experience);
         }
-        return  null;
+        return null;
     }
 }

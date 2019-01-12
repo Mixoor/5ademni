@@ -1,9 +1,7 @@
 package com.mixoor.khademni.controller;
 
 
-
 import com.mixoor.khademni.config.JwtTokenProvider;
-import com.mixoor.khademni.service.UserService;
 import com.mixoor.khademni.exception.AppException;
 import com.mixoor.khademni.model.*;
 import com.mixoor.khademni.payload.request.ClientSignUpRequest;
@@ -12,24 +10,26 @@ import com.mixoor.khademni.payload.request.LoginRequest;
 import com.mixoor.khademni.payload.response.ApiResponse;
 import com.mixoor.khademni.payload.response.JwtAuthenticationResponse;
 import com.mixoor.khademni.repository.*;
+import com.mixoor.khademni.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @RestController
@@ -92,7 +92,8 @@ public class AuthController {
 
         Client client = (Client) userService.CreateUser(clientSignUpRequest);
 
-        Role clientRole = roleRepository.findByName(RoleName.ROLE_CLIENT).orElseThrow(() -> new AppException("Role doesn't exist"));
+        Role clientRole = roleRepository.findByName(RoleName.ROLE_CLIENT)
+                .orElseThrow(() -> new AppException("Role doesn't exist"));
 
         client.setRole(clientRole);
         if (clientSignUpRequest.getLanguage() != null) {

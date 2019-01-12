@@ -15,7 +15,6 @@ public class Message extends DateAudit {
     private Long id;
 
     @Lob
-    @NotBlank
     private String message;
 
     @CreatedDate
@@ -25,11 +24,15 @@ public class Message extends DateAudit {
 
     @NotBlank
     private int status;
+
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(nullable = false, name = "sender_id")
     private User sender;
 
-
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(nullable = false, name = "receiver_id")
+    private User receiver;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(nullable = true, name = "file_id")
@@ -40,16 +43,22 @@ public class Message extends DateAudit {
     @JoinColumn(name = "conversation_id", nullable = false)
     private Conversation conversation;
 
-    public Message(@NotBlank String message, @NotBlank int status, User sender, Document document, Conversation conversation) {
+    public Message(String message, @NotBlank int status, User sender, User receiver, Document document, Conversation conversation) {
         this.message = message;
         this.status = status;
+        this.receiver = receiver;
         this.sender = sender;
         this.document = document;
         this.conversation = conversation;
     }
 
+    public User getReceiver() {
+        return receiver;
+    }
 
-
+    public void setReceiver(User receiver) {
+        this.receiver = receiver;
+    }
 
     public Long getId() {
         return id;

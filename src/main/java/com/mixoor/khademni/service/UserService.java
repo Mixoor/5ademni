@@ -77,7 +77,7 @@ public class UserService {
 
         skills.forEach(skill -> freelancer.removeSkill(skill));
 
-        List<SkillResponse> skillResponses = skills.stream().map(skill -> new ModelMapper()
+        List<SkillResponse> skillResponses = skills.stream().map(skill -> ModelMapper
                 .mapSkillToResponse(skill)).collect(Collectors.toList());
         return skillResponses;
 
@@ -92,7 +92,7 @@ public class UserService {
                 , request.getDescription(), request.getPosition(), freelancer);
 
         experienceRepository.save(experience);
-        return new ModelMapper().mapExperienceToResponse(freelancer, experience);
+        return ModelMapper .mapExperienceToResponse(freelancer, experience);
     }
 
     public void removeExperience(Experience experience) {
@@ -109,7 +109,7 @@ public class UserService {
             return new PagedResponse<>(Collections.emptyList(), experiences.getNumber(), experiences.getSize()
                     , experiences.getTotalElements(), experiences.getTotalPages(), experiences.isLast());
         List<ExperienceResponse> experienceResponses = experiences.stream()
-                .map(experience -> new ModelMapper().mapExperienceToResponse(freelancer, experience))
+                .map(experience -> ModelMapper .mapExperienceToResponse(freelancer, experience))
                 .collect(Collectors.toList());
         return new PagedResponse<ExperienceResponse>(experienceResponses, experiences.getNumber()
                 , experiences.getSize(), experiences.getTotalElements(), experiences.getTotalPages()
@@ -118,13 +118,13 @@ public class UserService {
 
     public List<SkillResponse> getAllSkills(Freelancer freelancer) {
         List<SkillResponse> skillResponses = freelancer.getSkills().stream()
-                .map(skill -> new ModelMapper().mapSkillToResponse(skill)).collect(Collectors.toList());
+                .map(skill -> ModelMapper .mapSkillToResponse(skill)).collect(Collectors.toList());
         return skillResponses;
     }
 
 
     public UserProfile getProfile(User user) {
-        return new ModelMapper().mapUserToProfile(user);
+        return ModelMapper .mapUserToProfile(user);
     }
 
 

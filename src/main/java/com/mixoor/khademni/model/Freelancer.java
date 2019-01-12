@@ -13,8 +13,6 @@ import java.util.Set;
 public class Freelancer extends User {
 
 
-    private float rating;
-
     @ManyToMany(fetch = FetchType.LAZY,
             cascade = {
                     CascadeType.MERGE, CascadeType.PERSIST
@@ -26,6 +24,7 @@ public class Freelancer extends User {
 
     )
     Set<Skill> skills = new HashSet<Skill>();
+    private float rating;
     private Date replyTime;
 
     @NotBlank

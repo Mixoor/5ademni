@@ -25,50 +25,6 @@ import java.util.Set;
 @Inheritance(strategy = InheritanceType.JOINED)
 public class User extends DateAudit {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @NotBlank
-    private String name;
-
-    @NotBlank
-    @Lob
-    private String aboutMe;
-
-    @Column(nullable = false)
-    @JsonIgnore
-    @Size(max = 100)
-    private String password;
-
-    @NaturalId
-    @NotBlank
-    @Email
-    @Size(max = 100)
-    private String email;
-
-    private String path = "";
-
-    @NotBlank
-    @Size(max = 100)
-    private String adresse;
-
-    @NotBlank
-    private String city;
-
-    @NotBlank
-    private String country;
-
-    @Temporal(TemporalType.DATE)
-    private Date dob;
-
-    @Enumerated(EnumType.STRING)
-    @NotNull
-    private Gender gender;
-
-    @Size(max = 15)
-    private String phone_number;
-
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "role_id", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
@@ -80,6 +36,38 @@ public class User extends DateAudit {
             inverseJoinColumns = @JoinColumn(name = "language_id")
     )
     Set<Language> languages = new HashSet<Language>();
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    @NotBlank
+    private String name;
+    @NotBlank
+    @Lob
+    private String aboutMe;
+    @Column(nullable = false)
+    @JsonIgnore
+    @Size(max = 100)
+    private String password;
+    @NaturalId
+    @NotBlank
+    @Email
+    @Size(max = 100)
+    private String email;
+    private String path = "";
+    @NotBlank
+    @Size(max = 100)
+    private String adresse;
+    @NotBlank
+    private String city;
+    @NotBlank
+    private String country;
+    @Temporal(TemporalType.DATE)
+    private Date dob;
+    @Enumerated(EnumType.STRING)
+    @NotNull
+    private Gender gender;
+    @Size(max = 15)
+    private String phone_number;
 
 
     public User() {

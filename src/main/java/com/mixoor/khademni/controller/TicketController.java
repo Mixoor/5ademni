@@ -29,9 +29,9 @@ public class TicketController {
 
     @PostMapping("/ticket")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> createTicket(@CurrentUser UserPrincipal userPrincipal, @Valid TicketRequest request){
+    public ResponseEntity<?> createTicket(@CurrentUser UserPrincipal userPrincipal, @Valid TicketRequest request) {
 
-        Ticket ticket = ticketService.createTicketResponse(userPrincipal,request);
+        Ticket ticket = ticketService.createTicketResponse(userPrincipal, request);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}").buildAndExpand(ticket.getId()).toUri();
         return ResponseEntity.created(location)
@@ -41,14 +41,14 @@ public class TicketController {
 
     @GetMapping("/tickets")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public PagedResponse<TicketResponse> getAll(@CurrentUser UserPrincipal userPrincipal, @RequestParam(value = "page",defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
-                                                @RequestParam(value = "size",defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size){
-        return ticketService.getAll(page,size);
+    public PagedResponse<TicketResponse> getAll(@CurrentUser UserPrincipal userPrincipal, @RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
+                                                @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size) {
+        return ticketService.getAll(page, size);
     }
 
     @GetMapping("/ticket/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public TicketResponse getById(@CurrentUser UserPrincipal user,@PathVariable(value = "id") Long id){
+    public TicketResponse getById(@CurrentUser UserPrincipal user, @PathVariable(value = "id") Long id) {
         return ticketService.getId(id);
     }
 

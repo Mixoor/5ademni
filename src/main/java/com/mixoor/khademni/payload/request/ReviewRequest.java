@@ -26,12 +26,12 @@ public class ReviewRequest {
         return title;
     }
 
-    public Long getClient() {
-        return client;
-    }
-
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public Long getClient() {
+        return client;
     }
 
     public void setClient(Long client) {

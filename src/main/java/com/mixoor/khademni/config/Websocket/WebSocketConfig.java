@@ -8,7 +8,6 @@ import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
-import org.springframework.messaging.simp.SimpMessageType;
 import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.messaging.simp.stomp.StompCommand;
@@ -20,9 +19,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.util.StringUtils;
-import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
@@ -51,7 +48,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
-        registry.enableSimpleBroker("/chat","/notification");
+        registry.enableSimpleBroker("/chat", "/notification");
         registry.setApplicationDestinationPrefixes("/app");
     }
 
@@ -60,13 +57,12 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         registration.interceptors(new ChannelInterceptor() {
             @Override
             public Message<?> preSend(Message<?> message, MessageChannel channel) {
-                StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(message,StompHeaderAccessor.class);
-                if(StompCommand.CONNECT.equals(accessor.getCommand())){
+                StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
+                if (StompCommand.CONNECT.equals(accessor.getCommand())) {
                     String token = accessor.getFirstNativeHeader("Token");
-                    System.out.println("Token : "+token);
+                    System.out.println("Token : " + token);
 
                     try {
-
 
 
                         if (StringUtils.hasText(token) && jwtTokenProvider.validateToken(token)) {
@@ -76,7 +72,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
                             // If the user is not valid than return an empty message
 
-                            if(Objects.isNull(userDetails))
+                            if (Objects.isNull(userDetails))
                                 return null;
 
                             Principal authentication = new UsernamePasswordAuthenticationToken(userDetails,
@@ -91,7 +87,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
                             if (Objects.nonNull(authentication))
-                               System.out.println("Disconnected Auth : " + authentication.getName());
+                                System.out.println("Disconnected Auth : " + authentication.getName());
                             else
                                 System.out.println("Disconnected Sess : " + accessor.getSessionId());
                         }

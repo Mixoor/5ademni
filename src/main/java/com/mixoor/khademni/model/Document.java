@@ -43,9 +43,11 @@ public class Document extends DateAudit {
         this.size = size;
     }
 
-    public Document(String fileName, String fileType) {
+    public Document(String fileName, String fileType, User user, long size) {
         this.fileName = fileName;
         this.fileType = fileType;
+        this.user = user;
+        this.size = size;
     }
 
     public String getId() {

@@ -4,11 +4,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 public class MessageRequest {
 
-       private  Long Sender;
-       private  Long receiver;
-       private  String Content;
-       private  Long conversation;
-       private MultipartFile file;
+    private Long Sender;
+    private Long receiver;
+    private String Content;
+    private Long conversation;
+    private MultipartFile file;
 
     public MessageRequest(Long sender, Long receiver, String content, Long conversation, MultipartFile file) {
         Sender = sender;

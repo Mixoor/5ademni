@@ -24,12 +24,8 @@ public interface ConversationRepository extends JpaRepository<Conversation, Long
     @Query("select c from Conversation c where c.user2.id=:id or c.user1.id=:id order by ?#{#pageable}")
     Page<Conversation> getAllConversationByUser(@Param("id") Long id, Pageable pageable);
 
-    @Query("select c from Conversation c where (c.user2.id=:user2 and c.user1.id=:user1) or (c.user2.id=:user2 and c.user1.id=:user1) order by ?#{#pageable}")
-    Optional<Conversation> getConversationByUser1AndUser2(@Param("user1") Long user1 , @Param("user2") Long user2, Pageable pageable);
-
-
-
-
+    @Query("select c from Conversation c where (c.user2.id=:user2 and c.user1.id=:user1) or (c.user2.id=:user1 and c.user1.id=:user2)")
+    Optional<Conversation> getConversationByUser1AndUser2(@Param("user1") Long user1, @Param("user2") Long user2);
 
 
 }

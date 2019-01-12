@@ -11,9 +11,9 @@ public class JobResponse {
 
     private String content;
 
-    private String budget;
+    private Long budget;
 
-    private String delai;
+    private int delai;
 
     private boolean availble;
 
@@ -28,7 +28,7 @@ public class JobResponse {
     public JobResponse() {
     }
 
-    public JobResponse(Long id, String title, String content, String budget, String delai, boolean availble
+    public JobResponse(Long id, String title, String content, Long budget, int delai, boolean availble
             , UserSummary createdby, Instant created, List<SkillResponse> skills) {
         this.id = id;
         this.title = title;
@@ -42,7 +42,7 @@ public class JobResponse {
     }
 
 
-    public JobResponse(Long id, String title, String content, String budget, String delai, boolean availble, UserSummary createdby, Instant created, List<SkillResponse> skills, List<UploadFileResponse> uploadFileResponses) {
+    public JobResponse(Long id, String title, String content, Long budget, int delai, boolean availble, UserSummary createdby, Instant created, List<SkillResponse> skills, List<UploadFileResponse> uploadFileResponses) {
         this.id = id;
         this.title = title;
         this.content = content;
@@ -95,19 +95,19 @@ public class JobResponse {
         this.content = content;
     }
 
-    public String getBudget() {
+    public Long getBudget() {
         return budget;
     }
 
-    public void setBudget(String budget) {
+    public void setBudget(Long budget) {
         this.budget = budget;
     }
 
-    public String getDelai() {
+    public int getDelai() {
         return delai;
     }
 
-    public void setDelai(String delai) {
+    public void setDelai(int delai) {
         this.delai = delai;
     }
 

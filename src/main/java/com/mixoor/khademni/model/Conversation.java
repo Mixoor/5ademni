@@ -5,15 +5,9 @@ import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
-import java.util.Date;
 
 @Entity
 public class Conversation extends DateAudit {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "first_user")
@@ -25,12 +19,13 @@ public class Conversation extends DateAudit {
     @OnDelete(action = OnDeleteAction.CASCADE)
     @NotBlank
     User user2;
-
-
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     @NotBlank
     private int status = 0;
 
-    public Conversation(@NotBlank User user1, @NotBlank User user2,  int status) {
+    public Conversation(@NotBlank User user1, @NotBlank User user2, int status) {
         this.user1 = user1;
         this.user2 = user2;
         this.status = status;
@@ -60,7 +55,6 @@ public class Conversation extends DateAudit {
     public void setUser2(User user2) {
         this.user2 = user2;
     }
-
 
 
     public int getStatus() {
