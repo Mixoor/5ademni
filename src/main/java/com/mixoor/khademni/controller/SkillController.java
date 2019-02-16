@@ -18,7 +18,7 @@ import javax.validation.Valid;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/skill")
 public class SkillController {
 
     @Autowired
@@ -27,13 +27,13 @@ public class SkillController {
     @Autowired
     UserService userService;
 
-    @GetMapping("/skills")
+    @GetMapping("/")
     public List<Skill> getSkills() {
         List<Skill> skills = skillRepository.findAll();
         return skills;
     }
 
-    @PostMapping("/skill")
+    @PostMapping("/")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> createSkill(@CurrentUser UserPrincipal userPrincipal, @Valid SkillRequest skillRequest) {
         Skill skill = ModelMapper.mapRequestToSkill(skillRequest);
@@ -43,7 +43,7 @@ public class SkillController {
         return ResponseEntity.ok().body(new ApiResponse(true, "Skill created successfully"));
     }
 
-    @DeleteMapping("/skill")
+    @DeleteMapping("/")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> deleteSkill(@CurrentUser UserPrincipal userPrincipal, @Valid SkillRequest skillRequest) {
         Skill skill = skillRepository.findByName(skillRequest.getName())

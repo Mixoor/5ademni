@@ -13,6 +13,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@RequestMapping("/api/message")
 public class MessageController {
 
 
@@ -21,7 +22,7 @@ public class MessageController {
 
 
 
-    @GetMapping("/api/message/{id}")
+    @GetMapping("/{id}")
     @PreAuthorize("isAuthenticated()")
     public PagedResponse<MessageResponse> getAllMessageInConversation(UserPrincipal userPrincipal, @PathVariable(value = "id") Long id,
                                                                       @RequestParam(value = "page",defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
@@ -32,7 +33,7 @@ public class MessageController {
 
     }
 
-    @PutMapping("/api/messages")
+    @PutMapping("/")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> UpdateMessages(UserPrincipal userPrincipal){
 

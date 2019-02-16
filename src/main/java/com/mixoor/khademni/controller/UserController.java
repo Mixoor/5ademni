@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
 
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/user")
 public class UserController {
 
     @Autowired
@@ -55,7 +55,7 @@ public class UserController {
     @Autowired
     LanguageRepository languageRepository;
 
-    @GetMapping("/user/me")
+    @GetMapping("/me")
     @PreAuthorize("isAuthenticated()")
     public Optional getCurrentUser(@CurrentUser UserPrincipal currentUser) {
         if (currentUser.getAuthorities().toArray()[0].toString().contains("ROLE_CLIENT")) {
@@ -76,7 +76,7 @@ public class UserController {
     }
 
 
-    @GetMapping("/user/checkEmailAvailability")
+    @GetMapping("/checkEmailAvailability")
     public UserIdentityAvailability checkEmailAvailability(@RequestParam(value = "email") String email) {
         Boolean isAvailable = !userRepository.existsByEmail(email);
         return new UserIdentityAvailability(isAvailable);
@@ -85,7 +85,7 @@ public class UserController {
 
 
 
-    @PutMapping("/user/me")
+    @PutMapping("/me")
     @PreAuthorize("isAuthenticated()")
     public UserProfile updateUser(@CurrentUser UserPrincipal currentUser, @Valid UserRequest userRequest) {
         User  user = userRepository.findById(currentUser.getId()).orElseThrow(() -> new ResourceNotFoundException("User", String.valueOf(currentUser.getId()), " "));
@@ -114,7 +114,7 @@ public class UserController {
 
     }
 
-    @DeleteMapping("user/me")
+    @DeleteMapping("/me")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> deleteUser(@CurrentUser UserPrincipal currentUser) {
 
@@ -136,7 +136,7 @@ public class UserController {
     // For Freelancer stuff
 
 
-    @GetMapping("/user/{id}/skill")
+    @GetMapping("/{id}/skill")
     public ResponseEntity<List<SkillResponse>> getSkills(@CurrentUser UserPrincipal userPrincipal , @PathVariable(name = "id") Long id){
         Freelancer  freelancer =freelancerRepository.
                 findById(id).orElseThrow(()->new BadRequestException("Freelancer doesn't exist"));
@@ -149,7 +149,7 @@ public class UserController {
 
     }
 
-    @GetMapping("/user/{id}/experience")
+    @GetMapping("/{id}/experience")
     public PagedResponse<ExperienceResponse> getExperience(@CurrentUser UserPrincipal userPrincipal , @PathVariable(name = "id") Long id,
                                                                   @RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
                                                                   @RequestParam(value = "size" , defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size){
@@ -164,7 +164,7 @@ public class UserController {
         return experienceResponses;
     }
 
-    @PostMapping("/user/me/experience")
+    @PostMapping("/me/experience")
     @PreAuthorize("hasRole('ROLE_FREELANCER')")
     public ExperienceResponse createExperience(@CurrentUser UserPrincipal userPrincipal, ExperienceRequest request){
         Freelancer freelancer = freelancerRepository.findById(userPrincipal.getId())
@@ -174,10 +174,16 @@ public class UserController {
 
     }
 
-    @PostMapping("user/me/skill")
+    @PostMapping("/me/skill")
     @PreAuthorize("hasRole('ROLE_FREELANCER')")
     public List<SkillResponse> setSkills(@CurrentUser UserPrincipal userPrincipal,List<String> skills){
             return userService.setSkills(userPrincipal,skills);
+    }
+
+    @GetMapping("me/static")
+    @PreAuthorize("isAuthenticated()")
+    public UserStatic userStatic(@CurrentUser UserPrincipal userPrincipal){
+        return userService.userStatic(userPrincipal);
     }
 
 

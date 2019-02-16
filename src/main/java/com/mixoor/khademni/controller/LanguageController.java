@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/language")
 public class LanguageController {
 
     @Autowired
@@ -18,18 +18,18 @@ public class LanguageController {
 
 
 
-    @GetMapping("/language")
+    @GetMapping("/")
     public List<Language> getLanguages(){
         return  languageRepository.findAll();
     }
 
-    @PostMapping("/language")
+    @PostMapping("/")
     public ResponseEntity saveLanguge(String language){
         Language  l =languageRepository.save(new Language(language));
         return  ResponseEntity.ok().body(l);
     }
 
-    @DeleteMapping("/language")
+    @DeleteMapping("/")
     public ResponseEntity deleteLanguge(String language){
         Language l =languageRepository.findByName(language).orElseThrow(()->new BadRequestException("Language doesn't exist"));
 

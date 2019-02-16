@@ -9,11 +9,9 @@ import com.mixoor.khademni.model.*;
 import com.mixoor.khademni.payload.request.SignUpRequest;
 import com.mixoor.khademni.payload.request.ExperienceRequest;
 import com.mixoor.khademni.payload.response.*;
-import com.mixoor.khademni.repository.ExperienceRepository;
-import com.mixoor.khademni.repository.FreelancerRepository;
-import com.mixoor.khademni.repository.SkillRepository;
-import com.mixoor.khademni.repository.UserRepository;
+import com.mixoor.khademni.repository.*;
 import com.sun.org.apache.xpath.internal.operations.Mod;
+import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -47,6 +45,14 @@ public class UserService {
 
     @Autowired
     FreelancerRepository freelancerRepository;
+
+    @Autowired
+    JobRepository jobRepository ;
+
+    @Autowired
+    ClientRepository clientRepository;
+
+
 
     public User CreateUser(SignUpRequest signUpRequest) {
         User user = new Client();
@@ -176,6 +182,28 @@ public class UserService {
     return new PagedResponse<UserSummary>(userSummaries,userPage.getNumber(),userPage.getSize(),
             userPage.getTotalElements(),userPage.getTotalPages(),userPage.isLast());
 
+    }
+
+    public UserStatic userStatic(UserPrincipal userPrincipal ){
+        User user = userRepository.getOne(userPrincipal.getId());
+        if(user.getRole().getName()==RoleName.ROLE_FREELANCER){
+
+            Freelancer freelancer = freelancerRepository.findById(user.getId()).orElseThrow(() -> new BadRequestException("User invalid "));
+            return new UserStatic(
+                    jobRepository.countByFreelancerAndAvailble(freelancer,true),
+                    freelancer.getCredit(),
+                    jobRepository.countByFreelancerAndAvailble(freelancer,false)
+            );
+
+        }else{
+            Client client = clientRepository.findById(user.getId()).orElseThrow(() -> new BadRequestException("User invalid "));
+            return new UserStatic(
+                    jobRepository.countByClientAndAvailble(client,true),
+                    client.getCredit(),
+                    jobRepository.countByClientAndAvailble(client,false)
+            );
+
+        }
     }
 
     private void validatePageAndSize(int page, int size) {

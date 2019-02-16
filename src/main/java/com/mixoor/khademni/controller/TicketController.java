@@ -20,14 +20,14 @@ import java.net.URI;
 
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/ticket")
 public class TicketController {
 
     @Autowired
     TicketService ticketService;
 
 
-    @PostMapping("/ticket")
+    @PostMapping("/")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> createTicket(@CurrentUser UserPrincipal userPrincipal, @Valid TicketRequest request) {
 
@@ -39,14 +39,14 @@ public class TicketController {
     }
 
 
-    @GetMapping("/tickets")
+    @GetMapping("/")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public PagedResponse<TicketResponse> getAll(@CurrentUser UserPrincipal userPrincipal, @RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
                                                 @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size) {
         return ticketService.getAll(page, size);
     }
 
-    @GetMapping("/ticket/{id}")
+    @GetMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public TicketResponse getById(@CurrentUser UserPrincipal user, @PathVariable(value = "id") Long id) {
         return ticketService.getId(id);

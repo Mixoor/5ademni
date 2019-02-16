@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/notification")
 public class NotificationController {
 
     @Autowired
@@ -22,7 +22,7 @@ public class NotificationController {
 
 
 
-    @GetMapping("/notification")
+    @GetMapping("/")
     public PagedResponse<NotificationResponse> getAll(@CurrentUser UserPrincipal userPrincipal,
                                                       @RequestParam(value = "page",defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page ,
                                                       @RequestParam(value = "size",defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int size

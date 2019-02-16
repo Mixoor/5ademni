@@ -27,6 +27,12 @@ public interface JobRepository extends JpaRepository<Job, Long> {
 
     Page<Job> findByFreelancer(Freelancer freelancer, Pageable pageable);
 
+    @Query("select count(j) from Job j where j.client= :client and j.availble= :available")
+    long countByClientAndAvailble(Client client,boolean available);
+
+    @Query("select count(j) from Job j where j.freelancer= :freelancer and j.availble= :available")
+    long countByFreelancerAndAvailble(Freelancer freelancer,boolean available);
+
     @Query("select j from Job j where  j.title like %:title% and j.availble = true and  (j.budget >= :min and j.budget <= :max) and j.delai >= :delai  order by ?#{#pageable}")
     Page<Job> searchByTitle(@Param("title") String title, @Param("max") Long max, @Param("min") Long min, @Param("delai") int delai, Pageable pageable);
 

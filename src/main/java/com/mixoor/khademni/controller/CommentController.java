@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/comments")
 public class CommentController {
 
 
@@ -41,7 +41,7 @@ public class CommentController {
     @Autowired
     NotificationService notificationService;
 
-    @GetMapping("/comments/{id}")
+    @GetMapping("/{id}")
     @PreAuthorize("isAuthenticated()")
     public PagedResponse<CommentResponse> getComments(@PathVariable(value = "id") Long id,
                                                       @RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
@@ -49,7 +49,7 @@ public class CommentController {
         return postService.getComments(id, page, size);
     }
 
-    @PostMapping("/comments/{id}")
+    @PostMapping("/{id}")
     @PreAuthorize("isAuthenticated()")
     public CommentResponse addComment(@CurrentUser UserPrincipal user, @PathVariable(value = "id") Long id, @Valid CommentRequest commentRequest) {
         Post post= postRepository.findById(id).orElseThrow(() ->
@@ -70,7 +70,7 @@ public class CommentController {
         return commentResponse;
     }
 
-    @PutMapping("/comments/{id}")
+    @PutMapping("/{id}")
     @PreAuthorize("isAuthenticated()")
     public CommentResponse updateComment(@CurrentUser UserPrincipal user, @PathVariable(value = "id") Long id, @Valid CommentRequest commentRequest) {
 
@@ -84,7 +84,7 @@ public class CommentController {
         return postService.updateComment(user, id, commentRequest);
     }
 
-    @DeleteMapping("/comments/{id}")
+    @DeleteMapping("/{id}")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> deleteComment(@CurrentUser UserPrincipal user, @PathVariable(value = "id") Long id, @Valid CommentRequest commentRequest) {
         Comment comment= commentRepository.findById(id).orElseThrow(() ->

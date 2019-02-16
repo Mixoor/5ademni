@@ -17,24 +17,24 @@ import javax.validation.Valid;
 
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/post")
 public class PostController {
 
     @Autowired
     PostService postService;
 
-    @GetMapping("/posts")
+    @GetMapping("/")
     private PagedResponse<PostResponse> getAll(@RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
                                                @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size) {
         return postService.getPosts(page, size);
     }
 
-    @GetMapping("/post/{id}")
+    @GetMapping("/{id}")
     public PostResponse getOne(@PathVariable(value = "id") Long id) {
         return postService.getPost(id);
     }
 
-    @PostMapping("/post")
+    @PostMapping("/")
     @PreAuthorize("isAuthenticated()")
     private ResponseEntity<?> addPost(@CurrentUser UserPrincipal userPrincipal, @Valid PostRequest postRequest) {
 
@@ -44,7 +44,7 @@ public class PostController {
     }
 
     //TODO ADD @PutMapping
-    @PutMapping("/post/{id}")
+    @PutMapping("/{id}")
     @PreAuthorize("isAuthenticated()")
     private ResponseEntity<?> updatePost(@CurrentUser UserPrincipal userPrincipal, @Valid PostRequest postRequest) {
         postService.createPost(userPrincipal, postRequest);

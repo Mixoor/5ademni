@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/application")
 public class ApplicationController {
 
     @Autowired
@@ -44,7 +44,7 @@ public class ApplicationController {
     @Autowired
     JobRepository jobRepository;
 
-    @GetMapping("/application/{id}")
+    @GetMapping("/{id}")
     @PreAuthorize("hasAnyRole('ROLE_CLIENT','ROLE_FREELANCER')")
     public PagedResponse<ApplicationResponse> getApplications(@CurrentUser UserPrincipal current,
                                                               @PathVariable(value = "id") Long id,
@@ -54,7 +54,7 @@ public class ApplicationController {
 
     }
 
-    @PostMapping("/application")
+    @PostMapping("/")
     @PreAuthorize("hasRole('ROLE_FREELANCER')")
     public ResponseEntity createApplication(@CurrentUser UserPrincipal userPrincipal,
                                             @Valid ApplicationRequest applicationRequest) {
@@ -69,7 +69,7 @@ public class ApplicationController {
 
     }
 
-    @DeleteMapping("/application/{post}")
+    @DeleteMapping("/{post}")
     @PreAuthorize("hasRole('ROLE_FREELANCER')")
     public ResponseEntity deleteApplication(@CurrentUser UserPrincipal userPrincipal,
                                             @PathVariable(value = "post") Long post) {

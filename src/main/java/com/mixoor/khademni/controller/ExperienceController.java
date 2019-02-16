@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/exp")
 public class ExperienceController {
 
     @Autowired
@@ -34,7 +34,7 @@ public class ExperienceController {
     UserService userService;
 
 
-    @GetMapping("exp/{id}")
+    @GetMapping("/{id}")
     public PagedResponse<ExperienceResponse> getExperiences(@CurrentUser UserPrincipal userPrincipal, @PathVariable(value = "id") Long id,
                                                             @RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
                                                             @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size) {
@@ -43,7 +43,7 @@ public class ExperienceController {
         return userService.getAllExperience(freelancer, page, size);
     }
 
-    @PostMapping("/exp")
+    @PostMapping("/")
     @PreAuthorize("hasRole('ROLE_FREELANCER')")
     public ExperienceResponse createExp(@CurrentUser UserPrincipal principal,
                                         @Valid ExperienceRequest request) {
@@ -52,7 +52,7 @@ public class ExperienceController {
         return userService.addExperience(freelancer, request);
     }
 
-    @DeleteMapping("/exp/{id}")
+    @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_FREELANCER')")
     public ResponseEntity<?> removeExp(@CurrentUser UserPrincipal principal, @PathVariable(value = "id") Long id) {
         Freelancer freelancer = freelancerRepository.findById(principal.getId())
@@ -68,7 +68,7 @@ public class ExperienceController {
         return ResponseEntity.ok().body(new ApiResponse(false, "Erreur "));
     }
 
-    @PutMapping("/exp/{id}")
+    @PutMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_FREELANCER')")
     public Experience updateExp(@CurrentUser UserPrincipal principal, @PathVariable(value = "id") Long id,
                                 @Valid ExperienceRequest request) {

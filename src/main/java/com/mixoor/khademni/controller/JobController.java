@@ -25,7 +25,7 @@ import java.util.List;
 
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/jobs")
 public class JobController {
 
     @Autowired
@@ -37,7 +37,7 @@ public class JobController {
     @Autowired
     private JobService jobService;
 
-    @GetMapping("/jobs")
+    @GetMapping("/")
     public PagedResponse<JobResponse> getAllJobs(@CurrentUser UserPrincipal current,
                                                  @RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
                                                  @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size) {
@@ -48,7 +48,7 @@ public class JobController {
 
 
 
-    @GetMapping("/jobs/search")
+    @GetMapping("/search")
     @PreAuthorize("isAuthenticated()")
     public PagedResponse<JobResponse> search(@CurrentUser UserPrincipal current,
                                                      @RequestParam(value = "skill", defaultValue = AppConstants.DEFAULT_SKILL) List<String> skill,
@@ -64,7 +64,7 @@ public class JobController {
     }
 
 
-    @GetMapping("/jobs/client")
+    @GetMapping("/client")
     @PreAuthorize("isAuthenticated()")
     public PagedResponse<JobResponse> getJobsByClient(@CurrentUser UserPrincipal current,
                                                       @RequestParam(value = "id", defaultValue = "", required = true) Long id,
@@ -75,7 +75,7 @@ public class JobController {
 
     }
 
-    @GetMapping("/jobs/freelancer")
+    @GetMapping("/freelancer")
     @PreAuthorize("isAuthenticated()")
     public PagedResponse<JobResponse> getJobsByFreelancer(@CurrentUser UserPrincipal current,
                                                           @RequestParam(value = "id", defaultValue = "", required = true) Long id,
@@ -86,7 +86,7 @@ public class JobController {
 
     }
 
-    @GetMapping("/jobs/contract")
+    @GetMapping("/contract")
     @PreAuthorize("hasAnyRole('ROLE_FREELANCER','ROLE_CLIENT')")
     public PagedResponse<ContractResponse> getJobsWithContract(@CurrentUser UserPrincipal current,
                                                                @RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
@@ -97,13 +97,13 @@ public class JobController {
     }
 
 
-    @GetMapping("/job/{id}")
+    @GetMapping("/{id}")
     public JobResponse getJob(@PathVariable(value = "id") Long id) {
 
         return jobService.getJobById(id);
     }
 
-    @PostMapping("/job")
+    @PostMapping("/")
     @PreAuthorize("hasRole('ROLE_CLIENT')")
     public ResponseEntity<?> createJob(@CurrentUser UserPrincipal userPrincipal, @Valid JobRequest jobRequest) {
         Job job = jobService.createJob(userPrincipal, jobRequest);
@@ -115,7 +115,7 @@ public class JobController {
     }
 
 
-    @PostMapping("/job/{id}")
+    @PostMapping("/set/{id}")
     @PreAuthorize("hasRole('ROLE_CLIENT')")
     public ResponseEntity<?> setFreelancerAndClose(@CurrentUser UserPrincipal userPrincipal, @PathVariable(value = "id") Long id,
                                                    Long freelancer) {
@@ -126,14 +126,14 @@ public class JobController {
     }
 
 
-    @PutMapping("/job/{id}")
+    @PutMapping("/{id}")
     @PreAuthorize("hasAnyRole('ROLE_CLIENT,ROLE_ADMIN')")
     public Job updateJob(@CurrentUser UserPrincipal userPrincipal, @PathVariable Long id, @Valid JobRequest job) {
         return jobService.UpdateJob(userPrincipal, job,id);
 
     }
 
-    @PostMapping("/job/invite")
+    @PostMapping("/invite")
     public ResponseEntity<?> inviteFreelancer(@CurrentUser UserPrincipal userPrincipal, NotificationRequest notificationRequest){
         notificationService.createNotification(userPrincipal,notificationRequest);
         return  ResponseEntity.ok().body("Invitation was send");

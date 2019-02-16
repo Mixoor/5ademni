@@ -11,11 +11,10 @@ import com.mixoor.khademni.service.ProjectService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/project")
 public class ProjectController {
 
     @Autowired
@@ -24,7 +23,7 @@ public class ProjectController {
 
 
 
-    @GetMapping("/projects")
+    @GetMapping("/")
     @PreAuthorize("isAuthenticated()")
     public PagedResponse<ProjectResponse> getProjects(@CurrentUser UserPrincipal userPrincipal,
                                                       @RequestParam(value = "page",defaultValue = AppConstants.DEFAULT_PAGE_NUMBER)int page,
@@ -33,26 +32,26 @@ public class ProjectController {
 
     }
 
-    @GetMapping("/project/{id}")
+    @GetMapping("/{id}")
     @PreAuthorize("isAuthenticated()")
     public ProjectResponse getProject(@CurrentUser UserPrincipal userPrincipal,@PathVariable Long id){
         return projectService.getProjectById(userPrincipal,id);
     }
 
-    @PostMapping("/project")
+    @PostMapping("/")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> createProject(@CurrentUser UserPrincipal userPrincipal, ProjectRequest request){
         ProjectResponse projectResponse=projectService.createProject(userPrincipal,request);
         return  ResponseEntity.ok().body(projectResponse);
     }
 
-    @PostMapping("/project/vote")
+    @PostMapping("/vote")
     @PreAuthorize("isAuthenticated()")
     public long castVote(@CurrentUser UserPrincipal userPrincipal,Long id){
         return  projectService.castVote(userPrincipal,id);
     }
 
-    @DeleteMapping("/project/vote")
+    @DeleteMapping("/vote")
     @PreAuthorize("isAuthenticated()")
     public long DeleteVote(@CurrentUser UserPrincipal userPrincipal,Long id){
         return  projectService.deleteVote(userPrincipal,id);
