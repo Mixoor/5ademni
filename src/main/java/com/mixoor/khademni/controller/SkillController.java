@@ -28,7 +28,7 @@ public class SkillController {
     UserService userService;
 
     @GetMapping("/skills")
-    public List<Skill> getSkills(@CurrentUser UserPrincipal userPrincipal) {
+    public List<Skill> getSkills() {
         List<Skill> skills = skillRepository.findAll();
         return skills;
     }

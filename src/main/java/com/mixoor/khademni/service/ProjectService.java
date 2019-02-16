@@ -7,6 +7,7 @@ import com.mixoor.khademni.exception.BadRequestException;
 import com.mixoor.khademni.model.Project;
 import com.mixoor.khademni.model.User;
 import com.mixoor.khademni.model.Vote;
+import com.mixoor.khademni.payload.request.NotificationRequest;
 import com.mixoor.khademni.payload.request.ProjectRequest;
 import com.mixoor.khademni.payload.response.PagedResponse;
 import com.mixoor.khademni.payload.response.ProjectResponse;
@@ -37,19 +38,22 @@ public class ProjectService {
     @Autowired
     VoteRepository voteRepository;
 
+    @Autowired
+    NotificationService notificationService;
 
-    private ProjectResponse createProject(UserPrincipal userPrincipal, ProjectRequest projectRequest) {
+
+    public ProjectResponse createProject(UserPrincipal userPrincipal, ProjectRequest projectRequest) {
 
         User user = userRepository.findById(userPrincipal.getId()).orElseThrow(() -> new BadRequestException("User doesn't exist"));
 
         Project project = ModelMapper .mapRequestToProject(projectRequest, user);
         projectRepository.save(project);
 
-        return ModelMapper .mapProjectToResponse(project, voteRepository.countByProject(project.getId()));
+        return ModelMapper .mapProjectToResponse(project, voteRepository.countByProject(project.getId()),false);
 
     }
 
-    private PagedResponse<ProjectResponse> getProjects(int page, int size) {
+    public PagedResponse<ProjectResponse> getProjects(UserPrincipal userPrincipal,int page, int size) {
         validatePageAndSize(page, size);
 
         Pageable pageable = PageRequest.of(page, size, Sort.Direction.DESC, "createAt");
@@ -60,8 +64,11 @@ public class ProjectService {
                     , projects.getSize(), projects.getTotalElements(), projects.getTotalPages()
                     , projects.isLast());
 
-        List<ProjectResponse> projectResponses = projects.stream().map((p) -> ModelMapper .mapProjectToResponse(p, voteRepository.countByProject(p.getId()))
-        ).collect(Collectors.toList());
+        List<ProjectResponse> projectResponses = projects.stream().map((p) -> {
+            boolean b=voteRepository.Isvoted(userPrincipal.getId(),p.getId())!= null;
+            return  ModelMapper .mapProjectToResponse(p, voteRepository.countByProject(p.getId()),b);
+
+        } ).collect(Collectors.toList());
 
         return new PagedResponse<ProjectResponse>(projectResponses, projects.getNumber(), projects.getSize()
                 , projects.getTotalElements(), projects.getTotalPages(), projects.isLast());
@@ -69,34 +76,41 @@ public class ProjectService {
 
     }
 
-    private ProjectResponse getProjectById(Long id) {
+    public ProjectResponse getProjectById(UserPrincipal userPrincipal,Long id) {
+
         Project project = projectRepository.findById(id)
                 .orElseThrow(() -> new BadRequestException("Project doesn't exist"));
-        return ModelMapper .mapProjectToResponse(project, voteRepository.countByProject(id));
+        boolean b=voteRepository.Isvoted(userPrincipal.getId(),id)!= null;
+
+        return ModelMapper .mapProjectToResponse(project, voteRepository.countByProject(id),b);
 
     }
 
-    private long castVote(UserPrincipal userPrincipal, Long id) {
+    public long castVote(UserPrincipal userPrincipal, Long id) {
 
         Project project = projectRepository.findById(id)
                 .orElseThrow(() -> new BadRequestException("Project doesn't exist "));
         User user = userRepository.findById(userPrincipal.getId())
                 .orElseThrow(() -> new BadRequestException("User doesn't exist"));
         Vote vote = new Vote(project, user);
-        voteRepository.findByUserAndAndProject(user, project)
+        voteRepository.findByUserAndProject(user, project)
                 .orElse(voteRepository.save(vote));
+
+        //Notifier the creator
+        NotificationRequest notificationRequest= new NotificationRequest(project.getCreated().getId(),id+"",8);
+        notificationService.createNotification(userPrincipal,notificationRequest);
 
         return voteRepository.countByProject(project.getId());
     }
 
 
-    private long deleteVote(UserPrincipal userPrincipal, Long id) {
+    public long deleteVote(UserPrincipal userPrincipal, Long id) {
 
         Project project = projectRepository.findById(id)
                 .orElseThrow(() -> new BadRequestException("Project doesn't exist "));
         User user = userRepository.findById(userPrincipal.getId())
                 .orElseThrow(() -> new BadRequestException("User doesn't exist"));
-        Vote vote = voteRepository.findByUserAndAndProject(user, project).orElseThrow(() ->
+        Vote vote = voteRepository.findByUserAndProject(user, project).orElseThrow(() ->
                 new BadRequestException("Vote doesn't exist "));
 
         voteRepository.delete(vote);

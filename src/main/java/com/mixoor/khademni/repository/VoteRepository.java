@@ -24,5 +24,8 @@ public interface VoteRepository extends JpaRepository<Vote, Long> {
 
     Page<Vote> findAll(Pageable pageable);
 
-    Optional<Vote> findByUserAndAndProject(User user, Project project);
+    @Query("select v from Vote v where v.project.id= :project and v.user.id= :user")
+    Vote Isvoted(@Param("user") Long user, @Param("project") Long project);
+
+    Optional<Vote> findByUserAndProject(User user, Project project);
 }

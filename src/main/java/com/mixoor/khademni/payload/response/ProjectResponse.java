@@ -16,13 +16,16 @@ public class ProjectResponse {
 
     private long count;
 
-    public ProjectResponse(Long id, String title, String content, Instant instant, long count, UserSummary userSummary) {
+    private boolean isCount;
+
+    public ProjectResponse(Long id, String title, String content, Instant instant, long count, UserSummary userSummary,boolean iscount) {
         this.id = id;
         this.title = title;
         this.count = count;
         this.instant = instant;
         this.content = content;
         this.userSummary = userSummary;
+        this.isCount=iscount;
     }
 
     public long getCount() {

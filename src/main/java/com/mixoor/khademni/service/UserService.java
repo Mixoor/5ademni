@@ -2,16 +2,18 @@ package com.mixoor.khademni.service;
 
 import com.mixoor.khademni.Util.AppConstants;
 import com.mixoor.khademni.Util.ModelMapper;
+import com.mixoor.khademni.config.CurrentUser;
+import com.mixoor.khademni.config.UserPrincipal;
 import com.mixoor.khademni.exception.BadRequestException;
 import com.mixoor.khademni.model.*;
-import com.mixoor.khademni.payload.request.ClientSignUpRequest;
+import com.mixoor.khademni.payload.request.SignUpRequest;
 import com.mixoor.khademni.payload.request.ExperienceRequest;
-import com.mixoor.khademni.payload.response.ExperienceResponse;
-import com.mixoor.khademni.payload.response.PagedResponse;
-import com.mixoor.khademni.payload.response.SkillResponse;
-import com.mixoor.khademni.payload.response.UserProfile;
+import com.mixoor.khademni.payload.response.*;
 import com.mixoor.khademni.repository.ExperienceRepository;
+import com.mixoor.khademni.repository.FreelancerRepository;
 import com.mixoor.khademni.repository.SkillRepository;
+import com.mixoor.khademni.repository.UserRepository;
+import com.sun.org.apache.xpath.internal.operations.Mod;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -22,9 +24,7 @@ import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -42,44 +42,64 @@ public class UserService {
     @Autowired
     ExperienceRepository experienceRepository;
 
-    public User CreateUser(ClientSignUpRequest clientSignUpRequest) {
+    @Autowired
+    UserRepository userRepository;
+
+    @Autowired
+    FreelancerRepository freelancerRepository;
+
+    public User CreateUser(SignUpRequest signUpRequest) {
         User user = new Client();
 
         SimpleDateFormat format = new SimpleDateFormat("YYYY/MM/DD", Locale.ENGLISH);
 
-
-        user.setAboutMe(clientSignUpRequest.getAboutMe());
-        user.setName(clientSignUpRequest.getName());
-        user.setAdresse(clientSignUpRequest.getAdresse());
-        user.setCity(clientSignUpRequest.getCity());
-        user.setCountry(clientSignUpRequest.getCountry());
+        if(!signUpRequest.getConfirm().equals(signUpRequest.getPassword()))
+            throw new BadRequestException("Password invalid ");
+        user.setAboutMe(signUpRequest.getAboutMe());
+        user.setName(signUpRequest.getName());
+        user.setAddress(signUpRequest.getAdresse());
+        user.setCity(signUpRequest.getCity());
+        user.setCountry(signUpRequest.getCountry());
         try {
-            user.setDob(format.parse(clientSignUpRequest.getDob()));
+            user.setDob(format.parse(signUpRequest.getDob()));
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        user.setEmail(clientSignUpRequest.getEmail());
+        user.setEmail(signUpRequest.getEmail());
 
 
-        user.setGender(clientSignUpRequest.getGender() == 0 ? Gender.male : Gender.female);
-        user.setPhone_number(clientSignUpRequest.getPhone());
-        user.setPassword(passwordEncoder.encode(clientSignUpRequest.getPassword()));
+        user.setGender(signUpRequest.getGender() == 0 ? Gender.male : Gender.female);
+        user.setPhone_number(signUpRequest.getPhone());
+        user.setPassword(passwordEncoder.encode(signUpRequest.getPassword()));
 
-        user.setPath(profilePictureService.storeProfilePicture(clientSignUpRequest.getPicture()));
+        user.setPath(profilePictureService.storeProfilePicture(signUpRequest.getPicture()));
 
         return user;
     }
 
-    public List<SkillResponse> addSkill(Freelancer freelancer, List<Skill> skills) {
+    public List<SkillResponse> setSkills(UserPrincipal userPrincipal,List<String> skills){
+        Freelancer freelancer = freelancerRepository.findById(userPrincipal.getId())
+                .orElseThrow(()-> new BadRequestException("User invalid"));
+        List<Skill> skill = skillRepository.getAll(skills);
 
-        if (skills.isEmpty())
-            return Collections.emptyList();
+
+        Freelancer updatedFreelancer=removeSkills(freelancer,freelancer.getSkills());
+
+
+        //remove all redundant values
+        Set<Skill> skillSet= new HashSet<Skill>(skill);
+
+        skillSet.forEach(skill1 -> updatedFreelancer.addSkill(skill1));
+
+        return skillSet.stream().map(skill1 -> ModelMapper.mapSkillToResponse(skill1))
+                .collect(Collectors.toList());
+
+    }
+
+    public Freelancer removeSkills(Freelancer freelancer, Set<Skill> skills) {
 
         skills.forEach(skill -> freelancer.removeSkill(skill));
-
-        List<SkillResponse> skillResponses = skills.stream().map(skill -> ModelMapper
-                .mapSkillToResponse(skill)).collect(Collectors.toList());
-        return skillResponses;
+        return freelancerRepository.save(freelancer);
 
     }
 
@@ -127,6 +147,36 @@ public class UserService {
         return ModelMapper .mapUserToProfile(user);
     }
 
+
+
+
+    public PagedResponse<UserSummary> getUsers(UserPrincipal userPrincipal, int page, int size, String type){
+        List<RoleName> roleNames=new ArrayList<RoleName>();
+        if(type.equals("client"))
+        roleNames.add(RoleName.ROLE_CLIENT);
+        else
+        roleNames.add(RoleName.ROLE_FREELANCER);
+
+    if(userPrincipal.getAuthorities().toArray()[0].toString().equals("ROLE_ADMIN")){
+        roleNames.add(RoleName.ROLE_ADMIN);
+        roleNames.add(RoleName.ROLE_FREELANCER);
+        roleNames.add(RoleName.ROLE_CLIENT);
+    }
+
+    Pageable pageable =PageRequest.of(page,size,Sort.Direction.DESC,"createdAt");
+
+    Page<User> userPage=userRepository.findAllByRole(roleNames,pageable);
+
+    if(userPage.getTotalElements() == 0 )
+        return new PagedResponse<>(Collections.emptyList(),userPage.getNumber(),userPage.getSize(),userPage.getTotalElements(),userPage.getTotalPages(),userPage.isLast());
+
+    List<UserSummary> userSummaries= userPage.stream().map(user -> ModelMapper.mapUserToUserSummary(user))
+            .collect(Collectors.toList());
+
+    return new PagedResponse<UserSummary>(userSummaries,userPage.getNumber(),userPage.getSize(),
+            userPage.getTotalElements(),userPage.getTotalPages(),userPage.isLast());
+
+    }
 
     private void validatePageAndSize(int page, int size) {
         if (page >= 0)

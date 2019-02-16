@@ -1,15 +1,19 @@
 package com.mixoor.khademni.service;
 
 import com.mixoor.khademni.exception.BadRequestException;
+import com.mixoor.khademni.exception.ResourceNotFoundException;
 import com.mixoor.khademni.property.FileProperties;
 import com.mixoor.khademni.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -74,6 +78,21 @@ public class ProfilePictureService {
         }
     }
 
+    public Resource loadDocAsRessource(String fileName) {
+        try {
+
+            Path filePath = this.fileStorageLocation.resolve(fileName).normalize();
+            Resource resource = new UrlResource(filePath.toUri());
+            if (resource.exists())
+                return resource;
+            else
+                throw new ResourceNotFoundException("File Not found", "", fileName);
+
+        } catch (MalformedURLException e) {
+            throw new ResourceNotFoundException("File Not found", fileName, " " + e);
+
+        }
+    }
 
     public boolean deleteFile(String path) {
         try {

@@ -1,5 +1,7 @@
 package com.mixoor.khademni.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 
@@ -19,6 +21,7 @@ public class Project extends DateAudit {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_id")
+    @JsonIgnore
     private User creator;
 
     public Project() {

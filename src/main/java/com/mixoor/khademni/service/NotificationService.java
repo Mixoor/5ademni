@@ -1,6 +1,7 @@
 package com.mixoor.khademni.service;
 
 import com.mixoor.khademni.Util.ModelMapper;
+import com.mixoor.khademni.Util.NotificationUtil;
 import com.mixoor.khademni.config.UserPrincipal;
 import com.mixoor.khademni.exception.BadRequestException;
 import com.mixoor.khademni.model.Notification;
@@ -33,10 +34,11 @@ public class NotificationService {
     UserRepository userRepository;
 
 
+
     @Autowired
     SimpMessagingTemplate simpMessagingTemplate;
 
-    public void createNotification(UserPrincipal userPrincipal, NotificationRequest request) {
+    public NotificationResponse createNotification(UserPrincipal userPrincipal, NotificationRequest request) {
 
         User sender = userRepository.findById(request.getReceiver()).orElseThrow(
                 () -> new BadRequestException("User Invalid "));
@@ -46,13 +48,14 @@ public class NotificationService {
 
 
         // Fill and save  Notification
-        Notification notification = new Notification(request.getMessage(), receiver, sender, NotificationType.values()[request.getType()], request.getUrl(), 0);
+        Notification notification = new Notification(NotificationUtil.getMessage(request.getType()), receiver, sender, NotificationType.values()[request.getType()], request.getUrl(), 0);
         notificationRepository.save(notification);
 
         // Send Response to user by the websocket
         NotificationResponse response = ModelMapper.mapResponseFromNotification(notification);
-        simpMessagingTemplate.convertAndSendToUser(String.valueOf(notification.getReceiver().getId()), "/notification", response);
+        simpMessagingTemplate.convertAndSendToUser(String.valueOf(notification.getReceiver().getEmail()), "/notification", response);
 
+        return response;
 
     }
 

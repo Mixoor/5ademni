@@ -9,17 +9,17 @@ import org.springframework.data.convert.Jsr310Converters;
 
 @SpringBootApplication
 @EntityScan(basePackageClasses = {
-        KhademniApplication.class,
-        Jsr310Converters.class,
-        FileProperties.class
+		KhademniApplication.class,
+		Jsr310Converters.class,
+		FileProperties.class
 
 })
 @EnableConfigurationProperties({
-        FileProperties.class
+		FileProperties.class
 })
 public class KhademniApplication {
 
-    public static void main(String[] args) {
-        SpringApplication.run(KhademniApplication.class, args);
-    }
+	public static void main(String[] args) {
+		SpringApplication.run(KhademniApplication.class, args);
+	}
 }

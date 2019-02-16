@@ -21,11 +21,7 @@ public class Client extends User {
         score = 0.0f;
     }
 
-    public Client(@NotBlank String name, @NotBlank String aboutMe, @Size(max = 100) String password, @NotBlank @Email @Size(max = 100) String email, String path, @NotBlank @Size(max = 100) String adresse, @NotBlank String city, @NotBlank String country, Date dob, @NotNull Gender gender, @Size(max = 15) String phone_number, Role role, Set<Language> languages) {
-        super(name, aboutMe, password, email, path, adresse, city, country, dob, gender, phone_number, role, languages);
-        credit = 0.0f;
-        score = 0.0f;
-    }
+
 
 
     public float getCredit() {

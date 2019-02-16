@@ -1,10 +1,12 @@
 package com.mixoor.khademni.model;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.data.annotation.CreatedDate;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 @Entity
@@ -17,33 +19,33 @@ public class Message extends DateAudit {
     @Lob
     private String message;
 
-    @CreatedDate
-    @Temporal(value = TemporalType.TIMESTAMP)
-    @NotBlank
-    private Date time;
 
-    @NotBlank
+
+    @NotNull
     private int status;
 
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(nullable = false, name = "sender_id")
     private User sender;
+
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(nullable = false, name = "receiver_id")
     private User receiver;
 
+    @JsonIgnore
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(nullable = true, name = "file_id")
     private Document document;
+
 
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "conversation_id", nullable = false)
     private Conversation conversation;
 
-    public Message(String message, @NotBlank int status, User sender, User receiver, Document document, Conversation conversation) {
+    public Message(String message,  int status, User sender, User receiver, Document document, Conversation conversation) {
         this.message = message;
         this.status = status;
         this.receiver = receiver;
@@ -76,13 +78,7 @@ public class Message extends DateAudit {
         this.message = message;
     }
 
-    public Date getTime() {
-        return time;
-    }
 
-    public void setTime(Date time) {
-        this.time = time;
-    }
 
     public int getStatus() {
         return status;

@@ -9,11 +9,13 @@ import com.mixoor.khademni.exception.UnauthorizedException;
 import com.mixoor.khademni.model.Comment;
 import com.mixoor.khademni.model.Post;
 import com.mixoor.khademni.payload.request.CommentRequest;
+import com.mixoor.khademni.payload.request.NotificationRequest;
 import com.mixoor.khademni.payload.response.ApiResponse;
 import com.mixoor.khademni.payload.response.CommentResponse;
 import com.mixoor.khademni.payload.response.PagedResponse;
 import com.mixoor.khademni.repository.CommentRepository;
 import com.mixoor.khademni.repository.PostRepository;
+import com.mixoor.khademni.service.NotificationService;
 import com.mixoor.khademni.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -36,6 +38,8 @@ public class CommentController {
     @Autowired
     PostRepository postRepository;
 
+    @Autowired
+    NotificationService notificationService;
 
     @GetMapping("/comments/{id}")
     @PreAuthorize("isAuthenticated()")
@@ -52,11 +56,18 @@ public class CommentController {
                 new BadRequestException("Post doesn't exist "));
 
         if(user.getId()!= post.getUser().getId())
-            throw new UnauthorizedException("you can't delete what its not yours begone  ");
+            throw new UnauthorizedException("you can't delete what its not yours be gone  ");
+
+        CommentResponse commentResponse = postService.addComment(user, id, commentRequest);
 
 
+        NotificationRequest notificationRequest = new
+                NotificationRequest(user.getId(),id+"?Comment="+commentResponse.getId(),1);
 
-        return postService.addComment(user, id, commentRequest);
+        notificationService.createNotification(user,notificationRequest);
+
+
+        return commentResponse;
     }
 
     @PutMapping("/comments/{id}")

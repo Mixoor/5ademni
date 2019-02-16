@@ -30,7 +30,7 @@ public class JwtTokenProvider {
                 .claim("name", userPrincipal.getName())
                 .claim("role", userPrincipal.getAuthorities().stream().map(GrantedAuthority::getAuthority)
                         .collect(Collectors.toList()))
-                .claim("Picture", userPrincipal.getPicture())
+                .claim("picture", userPrincipal.getPicture())
                 .setIssuedAt(new Date())
                 .setExpiration(expiryDate)
                 .signWith(SignatureAlgorithm.HS512, jwtSecret)

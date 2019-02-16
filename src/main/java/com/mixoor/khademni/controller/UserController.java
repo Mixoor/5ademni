@@ -1,15 +1,22 @@
 package com.mixoor.khademni.controller;
 
 
+import com.mixoor.khademni.Util.AppConstants;
+import com.mixoor.khademni.Util.ModelMapper;
 import com.mixoor.khademni.config.CurrentUser;
 import com.mixoor.khademni.config.UserPrincipal;
 import com.mixoor.khademni.exception.BadRequestException;
 import com.mixoor.khademni.exception.ResourceNotFoundException;
+import com.mixoor.khademni.model.Freelancer;
+import com.mixoor.khademni.model.Gender;
+import com.mixoor.khademni.model.Language;
 import com.mixoor.khademni.model.User;
-import com.mixoor.khademni.payload.response.UserIdentityAvailability;
-import com.mixoor.khademni.payload.response.UserProfile;
+import com.mixoor.khademni.payload.request.ExperienceRequest;
+import com.mixoor.khademni.payload.request.UserRequest;
+import com.mixoor.khademni.payload.response.*;
 import com.mixoor.khademni.repository.ClientRepository;
 import com.mixoor.khademni.repository.FreelancerRepository;
+import com.mixoor.khademni.repository.LanguageRepository;
 import com.mixoor.khademni.repository.UserRepository;
 import com.mixoor.khademni.service.ProfilePictureService;
 import com.mixoor.khademni.service.UserService;
@@ -17,10 +24,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 
 @RestController
@@ -42,7 +51,12 @@ public class UserController {
     @Autowired
     UserService userService;
 
+
+    @Autowired
+    LanguageRepository languageRepository;
+
     @GetMapping("/user/me")
+    @PreAuthorize("isAuthenticated()")
     public Optional getCurrentUser(@CurrentUser UserPrincipal currentUser) {
         if (currentUser.getAuthorities().toArray()[0].toString().contains("ROLE_CLIENT")) {
             return clientRepository.findById(currentUser.getId());
@@ -68,28 +82,40 @@ public class UserController {
         return new UserIdentityAvailability(isAvailable);
     }
 
+
+
+
     @PutMapping("/user/me")
-    public User updateUser(@CurrentUser UserPrincipal currentUser, @Valid User userRequest, @RequestParam(name = "picture") MultipartFile picture) {
-        return userRepository.findById(currentUser.getId()).map(user -> {
-
-            user.setAboutMe(userRequest.getAboutMe());
-            user.setAdresse(userRequest.getAdresse());
-            user.setGender(userRequest.getGender());
-            user.setCountry(userRequest.getCountry());
-            user.setLanguages(userRequest.getLanguages());
-            user.setName(userRequest.getName());
-            user.setDob(userRequest.getDob());
-            user.setPhone_number(userRequest.getPhone_number());
-            user.setCity(userRequest.getCity());
-            user.setPath(profilePictureService.storeProfilePicture(picture));
+    @PreAuthorize("isAuthenticated()")
+    public UserProfile updateUser(@CurrentUser UserPrincipal currentUser, @Valid UserRequest userRequest) {
+        User  user = userRepository.findById(currentUser.getId()).orElseThrow(() -> new ResourceNotFoundException("User", String.valueOf(currentUser.getId()), " "));
 
 
-            return userRepository.save(user);
+        user.setAboutMe(userRequest.getAboutMe());
+        user.setAddress(userRequest.getAddress());
+        user.setGender(Gender.values()[userRequest.getGender()]);
+        user.setCountry(userRequest.getCountry());
+        user.setLanguages(new HashSet<Language>(languageRepository.findAllById(userRequest.getLanguages())));
+        user.setName(userRequest.getName());
+        user.setDob(userRequest.getDob());
+        user.setPhone_number(userRequest.getPhone_number());
+        user.setCity(userRequest.getCity());
+        if(!userRequest.getPicture().equals(null))
+        {
+            profilePictureService.deleteFile(user.getPath());
+            user.setPath(profilePictureService.storeProfilePicture(userRequest.getPicture()));
+        }
 
-        }).orElseThrow(() -> new ResourceNotFoundException("User", String.valueOf(currentUser.getId()), " "));
+
+        User userFinished= userRepository.save(user);
+        UserProfile userProfile= ModelMapper.mapUserToProfile(userFinished);
+
+        return  userProfile;
+
     }
 
     @DeleteMapping("user/me")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> deleteUser(@CurrentUser UserPrincipal currentUser) {
 
         return userRepository.findById(currentUser.getId()).map(user -> {
@@ -97,6 +123,73 @@ public class UserController {
             return ResponseEntity.ok().build();
         }).orElseThrow(() -> new ResourceNotFoundException("User", "id", String.valueOf(currentUser.getId())));
     }
+
+    @GetMapping("/users")
+    @PreAuthorize("isAuthenticated()")
+    public PagedResponse<UserSummary> getUsers(@CurrentUser UserPrincipal userPrincipal,@RequestParam(value = "page",defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
+                                               @RequestParam(value = "size",defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size,
+                                               @RequestParam(value = "type",defaultValue = "user") String type){
+    return  userService.getUsers(userPrincipal,page,size,type);
+    }
+
+
+    // For Freelancer stuff
+
+
+    @GetMapping("/user/{id}/skill")
+    public ResponseEntity<List<SkillResponse>> getSkills(@CurrentUser UserPrincipal userPrincipal , @PathVariable(name = "id") Long id){
+        Freelancer  freelancer =freelancerRepository.
+                findById(id).orElseThrow(()->new BadRequestException("Freelancer doesn't exist"));
+
+        //Getting skills
+
+        List<SkillResponse>skillResponses = freelancer.getSkills().stream().map(skill -> ModelMapper.mapSkillToResponse(skill))
+                .collect(Collectors.toList());
+        return ResponseEntity.ok().body(skillResponses);
+
+    }
+
+    @GetMapping("/user/{id}/experience")
+    public PagedResponse<ExperienceResponse> getExperience(@CurrentUser UserPrincipal userPrincipal , @PathVariable(name = "id") Long id,
+                                                                  @RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
+                                                                  @RequestParam(value = "size" , defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size){
+        Freelancer  freelancer =freelancerRepository.
+                findById(id).orElseThrow(()->
+                new BadRequestException("Freelancer doesn't exist"));
+
+        //Getting Experience
+        PagedResponse<ExperienceResponse> experienceResponses = userService
+                .getAllExperience(freelancer,page,size);
+
+        return experienceResponses;
+    }
+
+    @PostMapping("/user/me/experience")
+    @PreAuthorize("hasRole('ROLE_FREELANCER')")
+    public ExperienceResponse createExperience(@CurrentUser UserPrincipal userPrincipal, ExperienceRequest request){
+        Freelancer freelancer = freelancerRepository.findById(userPrincipal.getId())
+                .orElseThrow(()-> new BadRequestException("Freelancer Invalid "));
+
+       return userService.addExperience(freelancer,request);
+
+    }
+
+    @PostMapping("user/me/skill")
+    @PreAuthorize("hasRole('ROLE_FREELANCER')")
+    public List<SkillResponse> setSkills(@CurrentUser UserPrincipal userPrincipal,List<String> skills){
+            return userService.setSkills(userPrincipal,skills);
+    }
+
+
+
+
+
+
+
+
+
+
+
 
 
 }

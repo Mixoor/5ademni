@@ -1,5 +1,6 @@
 package com.mixoor.khademni.Util;
 
+import com.mixoor.khademni.config.UserPrincipal;
 import com.mixoor.khademni.model.*;
 import com.mixoor.khademni.payload.request.*;
 import com.mixoor.khademni.payload.response.*;
@@ -111,7 +112,9 @@ public class ModelMapper {
         if (user instanceof Freelancer)
             return mapFreelancerToUserSummary((Freelancer) user);
 
-        return new UserSummary(user.getId(), user.getName(), user.getPath(), 0, user.getRole().toString());
+
+
+        return new UserSummary(user.getId(), user.getName(), user.getPath(), 0, "Admin");
 
 
     }
@@ -184,10 +187,10 @@ public class ModelMapper {
         return project;
     }
 
-    public static  ProjectResponse mapProjectToResponse(Project project, long c) {
+    public static  ProjectResponse mapProjectToResponse(Project project, long c,boolean b) {
         UserSummary userSummary = mapUserToUserSummary(project.getCreated());
         return new ProjectResponse(project.getId(), project.getTitle(), project.getContent()
-                , project.getCreatedAt(), c, userSummary);
+                , project.getCreatedAt(), c, userSummary,b);
 
     }
 
@@ -196,7 +199,7 @@ public class ModelMapper {
     }
 
     public static  Skill mapRequestToSkill(SkillRequest skillRequest) {
-        return new Skill(skillRequest.getName());
+        return new Skill(skillRequest.getName().toUpperCase());
     }
 
     public static  ExperienceResponse mapExperienceToResponse(Freelancer freelancer, Experience experience) {
@@ -209,12 +212,12 @@ public class ModelMapper {
         if (user instanceof Freelancer) {
             Freelancer freelancer = (Freelancer) user;
             return new UserProfile(freelancer.getId(), freelancer.getName(), freelancer.getAboutMe(), freelancer.getCountry()
-                    , freelancer.getCity(), freelancer.getDob(), freelancer.getAdresse(),
+                    , freelancer.getCity(), freelancer.getDob(), freelancer.getAddress(),
                     freelancer.getRole().getName().name().equalsIgnoreCase(RoleName.ROLE_CLIENT.name()) ? "Client" : "Freelancer", freelancer.getPath(), freelancer.getReplyTime(), freelancer.getRating());
         } else {
             Client freelancer = (Client) user;
             return new UserProfile(freelancer.getId(), freelancer.getName(), freelancer.getAboutMe(), freelancer.getCountry()
-                    , freelancer.getCity(), freelancer.getDob(), freelancer.getAdresse(),
+                    , freelancer.getCity(), freelancer.getDob(), freelancer.getAddress(),
                     freelancer.getRole().getName().name().equalsIgnoreCase(RoleName.ROLE_CLIENT.name()) ? "Client" : "Freelancer", freelancer.getPath(), freelancer.getScore());
         }
 
@@ -254,6 +257,13 @@ public class ModelMapper {
     }
 
     public static  MessageResponse mapMessageToResponse(Message message) {
+        if(message.getDocument()==null)
+            return new MessageResponse(
+                    message.getId(),
+                    mapUserToUserSummary(message.getSender()),
+                    message.getMessage(), mapConversationToResponse(message.getConversation()),message.getStatus()
+            );
+
         return new MessageResponse(
                 message.getId(),
                 mapUserToUserSummary(message.getSender()),
@@ -284,5 +294,28 @@ public class ModelMapper {
                 notification.getIsRead()
         );
     }
+
+    public static Review mapResponseToReview(ReviewRequest reviewRequest, Client client, Freelancer freelancer){
+        return new Review(new ReviewId(freelancer.getId(),client.getId()),
+                client,freelancer,reviewRequest.getTitle(),
+                reviewRequest.getMessage(),reviewRequest.getRate());
+
+    }
+    public static ReviewResponse mapReviewToResponse(Review review){
+        return  new ReviewResponse(mapClientUserSummary(review.getClient()),
+                mapFreelancerToUserSummary(review.getFreelancer()),
+                review.getTitle(),review.getMessage(),
+                review.getRate(),review.getReply());
+    }
+
+    public static  PortfolioResponse mapPortfolioToResponse(UserPrincipal userPrincipal,Portfolio portfolio){
+        return new PortfolioResponse(portfolio.getId(),portfolio.getDescription(),portfolio.getTitle(),portfolio.getPath(),mapFreelancerToUserSummary(portfolio.getFreelancer()));
+    }
+
+
+
+
+
+
 
 }

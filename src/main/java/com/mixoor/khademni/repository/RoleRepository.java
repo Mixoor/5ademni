@@ -20,6 +20,6 @@ public interface RoleRepository extends JpaRepository<Role, Long> {
     Optional<Role> findByName(RoleName role);
 
     @Query("select  r from Role r order by ?#{#pageable}")
-    Page<Role> search( Pageable pageable);
+    Page<Role> search(Pageable pageable);
 
 }

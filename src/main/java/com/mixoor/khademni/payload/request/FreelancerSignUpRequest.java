@@ -3,10 +3,9 @@ package com.mixoor.khademni.payload.request;
 import javax.validation.constraints.NotBlank;
 import java.util.Set;
 
-public class FreelancerSignUpRequest extends ClientSignUpRequest {
+public class FreelancerSignUpRequest extends SignUpRequest {
 
 
-    @NotBlank
     private Set<Long> skill;
 
     public Set<Long> getSkill() {

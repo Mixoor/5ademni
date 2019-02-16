@@ -5,17 +5,15 @@ public class NotificationRequest {
 
     private Long receiver;
 
-    private String message;
 
-    //type value varie between [0..3]
+    //type value varies between [0..8]
     private int type;
 
     private String url;
 
-    public NotificationRequest(Long receiver, String message, String url, int type) {
+    public NotificationRequest(Long receiver ,String url, int type) {
         this.receiver = receiver;
         this.url = url;
-        this.message = message;
         this.type = type;
     }
 
@@ -35,13 +33,6 @@ public class NotificationRequest {
         this.receiver = receiver;
     }
 
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
 
     public int getType() {
         return type;

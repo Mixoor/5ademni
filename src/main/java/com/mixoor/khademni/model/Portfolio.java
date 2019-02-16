@@ -11,23 +11,38 @@ import javax.validation.constraints.NotBlank;
 public class Portfolio extends DateAudit {
 
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "freelancer_id")
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JsonIgnore
     Freelancer freelancer;
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+
     @NotBlank
     private String description;
     @NotBlank
     private String title;
 
-    public Portfolio(@NotBlank String title, @NotBlank String description, Freelancer freelancer) {
+    @NotBlank
+    private String path;
+
+
+    public Portfolio(Freelancer freelancer, @NotBlank String description, @NotBlank String title, @NotBlank String path) {
+        this.freelancer = freelancer;
         this.description = description;
         this.title = title;
-        this.freelancer = freelancer;
+        this.path = path;
+    }
+
+    public String getPath() {
+        return path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
     }
 
     public Freelancer getFreelancer() {

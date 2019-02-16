@@ -62,13 +62,17 @@ public class JobService {
         return job;
     }
 
-    public Job UpdateJob(UserPrincipal current, JobRequest jobRequest) {
+    public Job UpdateJob(UserPrincipal current, JobRequest jobRequest,Long id) {
 
         Client client = clientRepository.findById(current.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("Client ", "id", String.valueOf(current.getId())));
+        Job jobi= jobRepository.findById(id).orElseThrow(()->new BadRequestException("Job Doesnt exist "));
 
-        if (client.getId().equals(current.getId()))
-            throw new UnauthorizedException("Unauthorized Error");
+
+            if (client.getId().equals(current.getId()))
+                throw new UnauthorizedException("Unauthorized Error");
+
+
 
 
         Job job = ModelMapper.mapJobRequestToJob(jobRequest, client);
@@ -79,6 +83,10 @@ public class JobService {
                                         , client, job)
                 ).collect(Collectors.toList());
 
+
+        job.setId(jobi.getId());
+
+        jobRepository.save(job);
 
         return job;
     }
@@ -285,8 +293,10 @@ public class JobService {
 
         if (skills.size() > 0)
         jobsBeforeFiltering = jobRepository
-                    .searchBySkillsAndTitle(skillRepository.getAll(skills),title,min,max,delai, pageable);
+                    .searchBySkillsAndTitle(skillRepository.getAll(skills.stream()
+                            .map(s -> s.toUpperCase()).collect(Collectors.toList())),title,min,max,delai, pageable);
         else
+
             jobsBeforeFiltering = jobRepository.
                     searchByTitle(title,min,max,delai, pageable);
 

@@ -7,7 +7,6 @@ import java.util.List;
 public class JobRequest {
 
 
-    private Long userId;
     private String title;
     private String description;
     private Long budget;
@@ -15,26 +14,8 @@ public class JobRequest {
     private List<MultipartFile> files;
     private List<String> skills;
 
-    public JobRequest() {
-    }
 
-    public JobRequest(Long userId, String title, String description, Long budget, int delai, List<MultipartFile> files, List<String> skills) {
-        this.userId = userId;
-        this.title = title;
-        this.description = description;
-        this.budget = budget;
-        this.delai = delai;
-        this.files = files;
-        this.skills = skills;
-    }
 
-    public Long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
 
     public String getTitle() {
         return title;

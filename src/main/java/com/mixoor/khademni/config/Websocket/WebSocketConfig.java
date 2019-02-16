@@ -2,6 +2,7 @@ package com.mixoor.khademni.config.Websocket;
 
 import com.mixoor.khademni.config.CustomUserDetailsService;
 import com.mixoor.khademni.config.JwtTokenProvider;
+import com.mixoor.khademni.config.UserPrincipal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
@@ -43,13 +44,14 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/secured-ws").withSockJS();
+        registry.addEndpoint("/secured-ws").setAllowedOrigins("*").withSockJS();
     }
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
         registry.enableSimpleBroker("/chat", "/notification");
         registry.setApplicationDestinationPrefixes("/app");
+        registry.setUserDestinationPrefix("/user");
     }
 
     @Override
@@ -75,13 +77,18 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                             if (Objects.isNull(userDetails))
                                 return null;
 
-                            Principal authentication = new UsernamePasswordAuthenticationToken(userDetails,
+
+
+                            Principal authentication =null;
+                            authentication = new UsernamePasswordAuthenticationToken(userDetails,
                                     null, userDetails.getAuthorities());
 
+                            UserPrincipal  userPrincipal = (UserPrincipal) userDetails;
                             accessor.setUser(authentication);
 
+
                             accessor.setLeaveMutable(true);
-                            return MessageBuilder.createMessage(message.getPayload(), accessor.getMessageHeaders());
+
 
                         } else if (StompCommand.DISCONNECT.equals(accessor.getCommand())) {
                             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -100,12 +107,20 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
                 }
 
-                //TODO Expermintal
-                return message;
+                //TODO Experimental
+                return MessageBuilder.createMessage(message.getPayload(), accessor.getMessageHeaders());
 
             }
         });
     }
+
+
+
+
+
+
+
+
 
 
 }

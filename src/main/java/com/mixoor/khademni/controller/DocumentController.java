@@ -41,15 +41,15 @@ public class DocumentController {
     }
 
     @GetMapping("/downloadFile/{fileName:.+}")
-    public ResponseEntity<Resource> downloadFile(@PathVariable String fileName, HttpServletRequest request) {
-        // Load file as Resource
-        Resource resource = documentStorageService.loadDocAsRessource(fileName);
+    public ResponseEntity<Resource> downloadFile(@PathVariable String fileName , HttpServletRequest httpServletRequest) {
+        Resource image = documentStorageService.
+                loadDocAsRessource(fileName);
 
-        // Try to determine file's content type
         String contentType = null;
         try {
-            contentType = request.getServletContext().getMimeType(resource.getFile().getAbsolutePath());
+            contentType = httpServletRequest.getServletContext().getMimeType(image.getFile().getAbsolutePath());
         } catch (IOException ex) {
+            ex.printStackTrace();
         }
 
         // Fallback to the default content type if type could not be determined
@@ -58,9 +58,11 @@ public class DocumentController {
         }
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType(contentType))
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
-                .body(resource);
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + image.getFilename() + "\"")
+                .body(image);
     }
+
+
 
 
 }

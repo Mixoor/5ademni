@@ -16,6 +16,12 @@ public class UserSummary {
         this.picture = picture;
         this.roleName = roleName;
     }
+    public UserSummary(Long id, String name, String picture, String roleName) {
+        this.id = id;
+        this.name = name;
+        this.picture = picture;
+        this.roleName = roleName;
+    }
 
     public String getRoleName() {
         return roleName;

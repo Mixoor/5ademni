@@ -56,7 +56,7 @@ public class User extends DateAudit {
     private String path = "";
     @NotBlank
     @Size(max = 100)
-    private String adresse;
+    private String address;
     @NotBlank
     private String city;
     @NotBlank
@@ -66,7 +66,7 @@ public class User extends DateAudit {
     @Enumerated(EnumType.STRING)
     @NotNull
     private Gender gender;
-    @Size(max = 15)
+    @Size(min = 8)
     private String phone_number;
 
 
@@ -79,7 +79,7 @@ public class User extends DateAudit {
         this.password = password;
         this.email = email;
         this.path = path;
-        this.adresse = adresse;
+        this.address = adresse;
         this.city = city;
         this.country = country;
         this.dob = dob;
@@ -137,12 +137,12 @@ public class User extends DateAudit {
         this.email = email;
     }
 
-    public String getAdresse() {
-        return adresse;
+    public String getAddress() {
+        return address;
     }
 
-    public void setAdresse(String adresse) {
-        this.adresse = adresse;
+    public void setAddress(String address) {
+        this.address = address;
     }
 
     public String getCity() {

@@ -14,7 +14,7 @@ public class Skill extends DateAudit {
 
     @JsonIgnore
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "skills")
-    Set<Freelancer> freelancers = new HashSet();
+    Set<Freelancer> freelancers = new HashSet<Freelancer>();
     @JsonIgnore
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL,
             mappedBy = "skills")

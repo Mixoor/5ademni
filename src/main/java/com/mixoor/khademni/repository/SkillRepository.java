@@ -15,7 +15,7 @@ public interface SkillRepository extends JpaRepository<Skill, Long> {
 
     Optional<Skill> findByName(String name);
 
-    @Query("select distinct s from Skill s where s.name in :skills")
+    @Query("select distinct s from Skill s where upper( s.name) in :skills")
     List<Skill> getAll(@Param("skills") List<String> skills);
 
 

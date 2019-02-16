@@ -56,7 +56,7 @@ public class MessageService {
 
         //check if message has attachment
         Document document = null;
-        if (!request.getFile().isEmpty()) {
+        if (!(request.getFile()== null)) {
             document = documentStorageService.documentToMessage(
                     documentStorageService.storeFile(request.getFile())
                     , sender

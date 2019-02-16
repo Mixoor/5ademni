@@ -1,8 +1,13 @@
 package com.mixoor.khademni.model;
 
 public enum NotificationType {
-    COMMENT,
     POST,
+    COMMENT,
     JOB,
-    APPLICATION
+    APPLICATION,
+    ACCEPTED,
+    REFUSED,
+    REVIEW,
+    REPLAY,
+    VOTE
 }

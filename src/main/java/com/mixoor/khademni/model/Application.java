@@ -1,5 +1,7 @@
 package com.mixoor.khademni.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import java.util.Date;
@@ -11,11 +13,15 @@ public class Application {
     @EmbeddedId
     private ApplicationId id;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "freelancer")
     @MapsId("freelancerId")
-    private User freelancer;
+    private Freelancer freelancer;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "job")
     @MapsId("jobId")
     private Job job;
 
@@ -32,7 +38,18 @@ public class Application {
 
     private String time;
 
-    public Application(ApplicationId applicationId, Freelancer freelancer, Job job, String content, String budget, String time) {
+    public Application(ApplicationId applicationId, Freelancer freelancer, Job job, String content, String budget
+            , String time) {
+        this.budget=budget;
+        this.freelancer=freelancer;
+        this.id= applicationId;
+        this.job=job;
+        this.content=content;
+        this.budget=budget;
+        this.time=time;
+
+
+
     }
 
     public Application(ApplicationId id, @NotBlank String content, Date creationOn) {
@@ -49,11 +66,11 @@ public class Application {
         this.id = id;
     }
 
-    public User getFreelancer() {
+    public Freelancer getFreelancer() {
         return freelancer;
     }
 
-    public void setFreelancer(User freelancer) {
+    public void setFreelancer(Freelancer freelancer) {
         this.freelancer = freelancer;
     }
 

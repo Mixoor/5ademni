@@ -5,12 +5,14 @@ import com.mixoor.khademni.config.CurrentUser;
 import com.mixoor.khademni.config.UserPrincipal;
 import com.mixoor.khademni.model.Job;
 import com.mixoor.khademni.payload.request.JobRequest;
+import com.mixoor.khademni.payload.request.NotificationRequest;
 import com.mixoor.khademni.payload.response.ApiResponse;
 import com.mixoor.khademni.payload.response.ContractResponse;
 import com.mixoor.khademni.payload.response.JobResponse;
 import com.mixoor.khademni.payload.response.PagedResponse;
 import com.mixoor.khademni.repository.JobRepository;
 import com.mixoor.khademni.service.JobService;
+import com.mixoor.khademni.service.NotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -19,6 +21,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
 import java.net.URI;
+import java.util.List;
 
 
 @RestController
@@ -27,6 +30,9 @@ public class JobController {
 
     @Autowired
     private JobRepository jobRepository;
+
+    @Autowired
+    private NotificationService notificationService;
 
     @Autowired
     private JobService jobService;
@@ -40,23 +46,20 @@ public class JobController {
     }
 
 
-    @GetMapping("/jobs/searchByTitle")
-    @PreAuthorize("isAuthenticated()")
-    public PagedResponse<JobResponse> getJobsByTitle(@CurrentUser UserPrincipal current,
-                                                     @RequestParam(value = "title", defaultValue = "", required = true) String title,
-                                                     @RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
-                                                     @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size) {
-        return jobService.getJobsByTitle(current, title, true, page, size);
 
-    }
 
-    @GetMapping("/jobs/searchBySkill")
+    @GetMapping("/jobs/search")
     @PreAuthorize("isAuthenticated()")
-    public PagedResponse<JobResponse> getJobsBySkill(@CurrentUser UserPrincipal current,
-                                                     @RequestParam(value = "skill", defaultValue = "", required = true) String skill,
-                                                     @RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
-                                                     @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size) {
-        return jobService.getJobsBySkills(skill.split(","), page, size);
+    public PagedResponse<JobResponse> search(@CurrentUser UserPrincipal current,
+                                                     @RequestParam(value = "skill", defaultValue = AppConstants.DEFAULT_SKILL) List<String> skill,
+                                                     @RequestParam(value = "title", defaultValue = AppConstants.DEFAULT_TITLE) String title,
+                                                     @RequestParam(value = "min", defaultValue = "0") Long min,
+                                                     @RequestParam(value = "max", defaultValue = "10000000") Long max,
+                                                     @RequestParam(value = "delai", defaultValue =AppConstants.DEFAULT_DELAI ) int delai,
+                                                    @RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
+                                                     @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size ,
+                                                     @RequestParam(value = "order", defaultValue = AppConstants.DEFAULT_DIRECTION) String order) {
+        return jobService.searchJob(current,page,size,skill,delai,min,max,title,order);
 
     }
 
@@ -85,7 +88,7 @@ public class JobController {
 
     @GetMapping("/jobs/contract")
     @PreAuthorize("hasAnyRole('ROLE_FREELANCER','ROLE_CLIENT')")
-    public PagedResponse<ContractResponse> getJobswithContract(@CurrentUser UserPrincipal current,
+    public PagedResponse<ContractResponse> getJobsWithContract(@CurrentUser UserPrincipal current,
                                                                @RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
                                                                @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size) {
         return jobService.getContract(current, page, size);
@@ -117,15 +120,23 @@ public class JobController {
     public ResponseEntity<?> setFreelancerAndClose(@CurrentUser UserPrincipal userPrincipal, @PathVariable(value = "id") Long id,
                                                    Long freelancer) {
         jobService.setFreelancerAndClose(id, freelancer);
+        notificationService.createNotification(userPrincipal,new NotificationRequest(freelancer,""+id,4));
         return ResponseEntity.ok().body(new ApiResponse(true, "Update finish successfully"));
 
     }
 
 
     @PutMapping("/job/{id}")
-    @PreAuthorize("hasRole('ROLE_CLIENT')")
+    @PreAuthorize("hasAnyRole('ROLE_CLIENT,ROLE_ADMIN')")
     public Job updateJob(@CurrentUser UserPrincipal userPrincipal, @PathVariable Long id, @Valid JobRequest job) {
-        return jobService.UpdateJob(userPrincipal, job);
+        return jobService.UpdateJob(userPrincipal, job,id);
+
+    }
+
+    @PostMapping("/job/invite")
+    public ResponseEntity<?> inviteFreelancer(@CurrentUser UserPrincipal userPrincipal, NotificationRequest notificationRequest){
+        notificationService.createNotification(userPrincipal,notificationRequest);
+        return  ResponseEntity.ok().body("Invitation was send");
 
     }
 

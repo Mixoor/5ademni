@@ -1,7 +1,11 @@
 package com.mixoor.khademni.payload.response;
 
 
+import com.mixoor.khademni.model.Language;
+import com.mixoor.khademni.model.Skill;
+
 import java.util.Date;
+import java.util.List;
 
 public class UserProfile {
 
@@ -16,6 +20,10 @@ public class UserProfile {
     private String picture;
     private Date replyTime;
     private float rating;
+
+
+
+
 
     public UserProfile(Long id, String name, String aboutMe, String country, String city, Date dob, String adresse, String role, String picture, float rating) {
         this.id = id;

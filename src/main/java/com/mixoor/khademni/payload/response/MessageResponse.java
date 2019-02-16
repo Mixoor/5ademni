@@ -17,6 +17,13 @@ public class MessageResponse {
 
     private int status;
 
+    public MessageResponse(Long id, UserSummary sender, String content, ConversationResponse conversation, int status){
+        this.id = id;
+        this.sender = sender;
+        this.content = content;
+        this.conversation = conversation;
+        this.status = status;
+    }
 
     public MessageResponse(Long id, UserSummary sender, String content, ConversationResponse conversation, String attachment, int status) {
         this.id = id;

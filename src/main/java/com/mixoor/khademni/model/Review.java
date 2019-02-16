@@ -1,7 +1,12 @@
 package com.mixoor.khademni.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 @Entity
 public class Review extends DateAudit {
@@ -11,14 +16,18 @@ public class Review extends DateAudit {
     private ReviewId id;
 
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "client")
     @MapsId("clientId")
-    private User client;
+    private Client client;
 
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "freelancer")
     @MapsId("freelancerId")
-    private User freelancer;
+    private Freelancer freelancer;
 
     @NotBlank
     private String title;
@@ -32,7 +41,7 @@ public class Review extends DateAudit {
     @NotBlank
     private int rate;
 
-    public Review(ReviewId id, User client, User freelancer, @NotBlank String title, @NotBlank String message, @NotBlank int rate) {
+    public Review(ReviewId id, Client client, Freelancer freelancer, @NotBlank String title, @NotBlank String message, @NotBlank int rate) {
         this.id = id;
         this.client = client;
         this.freelancer = freelancer;
@@ -65,19 +74,19 @@ public class Review extends DateAudit {
         this.id = id;
     }
 
-    public User getClient() {
+    public Client getClient() {
         return client;
     }
 
-    public void setClient(User client) {
+    public void setClient(Client client) {
         this.client = client;
     }
 
-    public User getFreelancer() {
+    public Freelancer getFreelancer() {
         return freelancer;
     }
 
-    public void setFreelancer(User freelancer) {
+    public void setFreelancer(Freelancer freelancer) {
         this.freelancer = freelancer;
     }
 

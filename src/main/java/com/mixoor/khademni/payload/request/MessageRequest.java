@@ -1,5 +1,7 @@
 package com.mixoor.khademni.payload.request;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.multipart.MultipartFile;
 
 public class MessageRequest {
@@ -8,15 +10,10 @@ public class MessageRequest {
     private Long receiver;
     private String Content;
     private Long conversation;
-    private MultipartFile file;
 
-    public MessageRequest(Long sender, Long receiver, String content, Long conversation, MultipartFile file) {
-        Sender = sender;
-        this.receiver = receiver;
-        Content = content;
-        this.conversation = conversation;
-        this.file = file;
-    }
+    private MultipartFile file =null;
+
+
 
 
     public Long getSender() {
@@ -52,8 +49,11 @@ public class MessageRequest {
     }
 
     public MultipartFile getFile() {
-        return file;
-    }
+        if(file==null)
+            return null;
+
+        return  file;
+}
 
     public void setFile(MultipartFile file) {
         this.file = file;
